@@ -3,7 +3,7 @@ const ListingSchema = new mongoose.Schema(
     {
         Title: {type: String, required: true},
         Description: {type: String, required: true},
-        Price: {type: String, required: true},
+        Price: {type: Number, required: true},
         Address: {
             numberhouse: {type: String, required: true},
             CommuneID: {type: String, required: true, default: "Unknown"},
@@ -30,7 +30,14 @@ const ListingSchema = new mongoose.Schema(
             required:true},
         User: {type: mongoose.Schema.Types.ObjectId, ref: "users", required: true},
         CatagoryProperty: {type: mongoose.Schema.Types.ObjectId, ref: "catagorypropertys", required: true},
+        type: {
+            type: String,
+            enum: ["normal", "vip"],
+            default: "normal"
+        },
         ExpiredAt: { type: Date,default: new Date(0) }, 
+        isDeleted: { type: Boolean, default: false },
+        deletedAt: { type: Date, default: new Date(0) },
     },
     {
         timestamps: true,

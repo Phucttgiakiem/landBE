@@ -43,7 +43,7 @@ const createListing = (data,files) => {
     })
 }
 
-const updateListing = (id,data) => {
+const updateListing = (id,data,files) => {
     return new Promise(async (resolve,reject) => {
         try{
             const checkListing = await Listing.findOne({ _id:id});
@@ -53,7 +53,27 @@ const updateListing = (id,data) => {
                     message: "the listing is not defined"
                 })
             }
-            const updateListing = await Listing.findByIdAndUpdate(id,data,{new:true});
+            // when update listing, any field another initial field, the field will be update
+            const listingObj = checkListing.toObject();
+            const updateData = {};
+           Object.keys(listingObj).forEach((field) => {
+                if (
+                    data[field] !== undefined &&
+                    listingObj[field] !== data[field]
+                ) {
+                    updateData[field] = data[field];
+                }
+            });
+            const updateListing = await Listing.findByIdAndUpdate(id,updateData,{new:true});
+            // update image listing
+            if(files && files.length > 0){
+                await ImagePtService.createImagePtmultip(files, id);
+            }
+
+            const removedImages = JSON.parse(data.removedImages)
+            if(removedImages && removedImages.length > 0){
+                await ImagePtService.deleteImagewithId(removedImages);
+            }
              resolve({
                 status: "OK",
                 message: "SUCCESS",
@@ -64,25 +84,58 @@ const updateListing = (id,data) => {
         }
     })
 }
-const deleteListing = (id) => {
+const deleteListing = (arrid) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const checkListing = await Listing.findOne({ _id:id});
-            if(checkListing === null){
-                resolve({
-                    status: "OK",
-                    message: "the listing is not defined"
-                })
-            }
-            await Listing.findByIdAndDelete({_id:id});
+            await Listing.deleteMany({_id: {$in: arrid}});
+            await ImagePtService.deleteAllImagewithId(arrid);
             resolve({
                 status: "OK",
-                message: "Delete Listing success"
+                message: "Delete array listing success"
             });
         } catch (e) {
             reject(e);
         }
     })
+}
+const softDeleteListing = (arrId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+           // console.log(arrId);
+            await Listing.updateMany(
+                {_id:{ $in: arrId }},
+                {$set: {
+                    isDeleted: true,
+                    deletedAt: new Date()
+                }}
+            );
+            resolve({
+                status: "OK",
+                message: "Soft delete listing success"
+            });
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
+const restoreListing = (arrId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            await Listing.updateMany(
+                {_id:{ $in: arrId }},
+                {$set: {
+                    isDeleted: false,
+                    deletedAt: new Date(0)
+                }}
+            );  
+            resolve({
+                status: "OK",
+                message: "Restore listing success"
+            });
+        } catch (e) {
+            reject(e);
+        }   
+    });
 }
 const buildQuery = (filters) => {
     const query = {};
@@ -91,6 +144,7 @@ const buildQuery = (filters) => {
 
     filters = JSON.parse(filters);
     Object.keys(filters).forEach((field) => {
+        if (field === "keyword") return;
         let value = filters[field];
 
         // Bỏ qua null hoặc undefined
@@ -147,76 +201,87 @@ const buildQuery = (filters) => {
 const getAllListing = (limit,page,sort,filters) => {
     return new Promise(async (resolve,reject) => {
         try {
-            const query = buildQuery(filters);
-            const totalListing = await Listing.countDocuments(query);
-            /* if(filter){
-                const objectFilter = {}
-                objectFilter[filter[0]] = filter[1];
-                const AllListingFilter = await Listing.find(
-                    { [filter[0]]: { '$regex': filter[1]}}
-                ).limit(limit)
-                .skip(page * limit);
-                resolve({
-                    status: "OK",
-                    message: "SUCCESS",
-                    data: AllListingFilter,
-                    total: totalListing,
-                    pageCurrent: page + 1,
-                    totalPage: Math.ceil(totalListing / limit)
-                })
-            }
-            if(sort){
-                const objectSort = {}
-                objectSort[sort[1]] = sort[0];
-                console.log(objectSort)
-                const AllListingSort = await Listing.find()
-                .limit(limit)
-                .skip(page * limit)
-                .sort(objectSort)
-                resolve({
-                    status: "OK",
-                    message: "SUCCESS",
-                    data: AllListingSort,
-                    total: totalListing,
-                    pageCurrent: page + 1,
-                    totalPage: Math.ceil(totalListing / limit)
-                })
-            } */
-           let queryBuilder = Listing.find(query)
-                .limit(limit)
-                .skip((page - 1) * limit);
+           const parsedFilters = filters ? JSON.parse(filters) : {};
 
-            if (sort && sort.field) {
-                const sortObject = {};
-                sortObject[sort.field] = sort.order === "ascend" ? 1 : -1;
-                queryBuilder = queryBuilder.sort(sortObject);
-            }
-
-            const AllListing = await queryBuilder;
-
-            /* return {
-                status: "OK",
-                data,
-                total,
-                pageCurrent: page + 1,
-                totalPage: Math.ceil(total / limit)
+            // base query (không có keyword)
+            const query = {
+                ...buildQuery(filters),
+                isDeleted: { $ne: true }
             };
-            const AllListing = await Listing.find()
-                .limit(limit)
-                .skip(page * limit)
-                 */
+
+            // xử lý keyword riêng
+            if (parsedFilters.keyword && parsedFilters.keyword.trim() !== "") {
+
+                const keywords = parsedFilters.keyword.trim();
+
+                query.$or = [
+                        { Title: { $regex: keywords, $options: "i" } },
+                        { Description: { $regex: keywords, $options: "i" } }
+                    ]
+                
+            }
+            let sortObject = { createdAt: -1,_id: -1}; //default
+            if(sort && sort.order){
+                const fieldMap = {
+                    createdAt: "createdAt"
+                }
+                const field = fieldMap[sort.field] || sort.field;
+                sortObject = {
+                    [field]: sort.order === "ascend" ? 1 : -1
+                }
+            }
+            
+            // Run in parallel for optimal performance
+            const AllListing = await Listing.find(query)
+                                    .sort(sortObject)
+                                    .skip((page - 1) * limit)
+                                    .limit(limit);
+            const totalListing = await Listing.countDocuments(query).where("isDeleted").ne(true);
+            const countitemdelete = await Listing.countDocuments({isDeleted: true});
+            
+
             resolve({
                 status: "OK",
                 message: "SUCCESS",
                 data: AllListing,
                 total: totalListing,
-                pageCurrent: page + 1,
+                pageCurrent: page,
+                itemdeleted: countitemdelete,
+                totalPage: Math.ceil(totalListing / limit)
+            })
+        }catch(e){
+            console.log(e);
+            reject(e);
+        }
+    })
+}
+const getAllListingDeleted = (limit,page,sort) => {
+    return new Promise(async (resolve,reject) => {
+        try {
+            const totalListing = await Listing.countDocuments({isDeleted:true});
+            let queryBuilder = Listing.find({isDeleted:true})
+                .limit(limit)
+                .skip((page - 1) * limit);
+            if (sort && sort.field) {
+                const sortObject = {};
+                sortObject[sort.field] = sort.order === "ascend" ? 1 : -1;
+                queryBuilder = queryBuilder.sort(sortObject);
+            }
+            const AllListing = await queryBuilder;
+            
+            
+            resolve({
+                status: "OK",
+                message: "SUCCESS",
+                data: AllListing,
+                total: totalListing,
+                pageCurrent: page,
                 totalPage: Math.ceil(totalListing / limit)
             })
         }catch(e){
             reject(e);
         }
-    })
+    });
 }
 const getDetailsListing = (id) => {
     return new Promise(async (resolve,reject) => {
@@ -243,5 +308,8 @@ module.exports = {
     updateListing,
     deleteListing,
     getAllListing,
-    getDetailsListing
+    getDetailsListing,
+    softDeleteListing,
+    getAllListingDeleted,
+    restoreListing 
 }
