@@ -3,19 +3,27 @@ import {Listing} from "../models/Listingmodel.js"
 import ImagePtService from "../services/ImagePtService.js";
 const createListing = (data,files) => {
     return new Promise(async (resolve, reject) => {
-         const {Title,Description,Price,numberhouse,CommuneID,CityID,
+         const {Title,Description,Price,numberhouse,Commune,City,
                 horizontal,vertical,front_street,floor,bedroom,bathroom,Toilet,
-                Legal,User,CatagoryProperty
+                Legal,User,CatagoryProperty,Type
         } = data;
         try {
+            let commune = Commune.split('-');
+            let city = City.split('-');
             const createListing = await Listing.create({
                 Title: Title,
                 Description: Description,
                 Price: Price,
                 Address: {
                     numberhouse: numberhouse,
-                    CommuneID: CommuneID,
-                    CityID: CityID,
+                    Commune: {
+                        id: commune[0],
+                        name: commune[1]
+                    },
+                    City: {
+                        id: city[0],
+                        name: city[1]
+                    },
                 },
                 horizontal: horizontal,
                 vertical: vertical,
@@ -29,6 +37,8 @@ const createListing = (data,files) => {
                 visibility_status: "công khai",
                 User:User,
                 CatagoryProperty:CatagoryProperty,
+                type: Type
+
             });
             if (files && files.length > 0) {
                 await ImagePtService.createImagePtmultip(files, createListing._id);
@@ -38,6 +48,7 @@ const createListing = (data,files) => {
                 message: "SUCCESS",
             });
         } catch (e) {
+            console.log(e);
             reject(e);
         }
     })
@@ -286,19 +297,63 @@ const getAllListingDeleted = (limit,page,sort) => {
 const getDetailsListing = (id) => {
     return new Promise(async (resolve,reject) => {
         try {
-            const data = await Listing.findOne({_id:id});
+            const data = await Listing.aggregate([
+                {
+                    $match:{
+                        isDeleted:false,
+                        _id:new mongoose.Types.ObjectId(id)
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        let : {userid:"$User"},
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: {
+                                        $eq: [
+                                            "$_id",
+                                            { $toObjectId: "$$userid" }
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                $project: {
+                                    _id: 1,
+                                    fullname: 1,
+                                    email: 1,
+                                    phone: 1,
+                                }
+                            }
+                        ],
+                        as: "UserInfo",
+                    }
+                },
+                {
+                     $unwind: {
+                        path: "$UserInfo",
+                        preserveNullAndEmptyArrays: true
+                    }
+                }
+            ])
             if(data === null) {
                 resolve({
                     status: "OK",
                     message: "the listing is not defined"
                 });
             }
+            const countnewsofuser = await Listing.countDocuments({isDeleted:false}).where('User').equals(data[0].User);
+            delete data[0]["User"];
+            data[0]["UserInfo"]["countnew"] = countnewsofuser;
             resolve({
                 status: "OK",
                 message: "SUCCESS",
-                data: data
+                data: {...data[0]}
             });
         } catch (e) {
+            console.log(e);
             reject(e);
         }
     })
