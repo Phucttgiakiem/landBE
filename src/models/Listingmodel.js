@@ -6,8 +6,14 @@ const ListingSchema = new mongoose.Schema(
         Price: {type: Number, required: true},
         Address: {
             numberhouse: {type: String, required: true},
-            CommuneID: {type: String, required: true, default: "Unknown"},
-            CityID: {type: String, required: true},
+            Commune: {
+                id: {type:String, required: true},
+                name:{type:String,required:true},
+            },
+            City:{ 
+                id: {type: String, required: true},
+                name: {type:String, required: true},
+            },
         },
         horizontal: {type: String, required:true},
         vertical: {type: String, required:true},

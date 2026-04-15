@@ -1,4 +1,4 @@
-
+import mongoose from "mongoose";
 import {Listing} from "../models/Listingmodel.js"
 
 const getAllHome = () => {
@@ -131,12 +131,12 @@ const getAllHome = () => {
                     approval_status: "đã xác thực",
                     visibility_status: "công khai",
                     isDeleted: false,
-                    "Address.CityID": { $in: cityIds }
+                    "Address.City.id": { $in: cityIds }
                     }
                 },
                 {
                     $group: {
-                    _id: "$Address.CityID",
+                    _id: "$Address.City.id",
                     count: { $sum: 1 }
                     }
                 } 
@@ -164,6 +164,71 @@ const getAllHome = () => {
         }
     });
 }
+const getAllListingRelated = (limit,page,CommuneID,CityID) => {
+    return new Promise(async(resolve,reject) => {
+        try {
+            const pageNum = Number(page);
+            const limitNum = Number(limit);
+
+            const query = {
+              "Address.Commune.id": CommuneID,
+                "Address.City.id": CityID,
+                isDeleted: { $ne: true },
+                approval_status: "đã xác thực",
+                visibility_status: { $nin: ["ẩn", "bị khóa"] }
+            }
+            const AllListing = await Listing.aggregate([
+                {
+                    $match: {
+                        isDeleted: false,
+                        "Address.Commune.id": CommuneID,
+                        "Address.City.id": CityID,
+                        approval_status: "đã xác thực",
+                        visibility_status: { $nin: ["ẩn", "bị khóa"] }
+                    },
+                },
+                {
+                    $sort: { createdAt: -1 }
+                },
+                {   $skip: (pageNum - 1) * limitNum },
+                {
+                    $limit: limitNum
+                },
+                {
+                    $lookup: {
+                    from: "imagepropertys", 
+                    let: { listingid: "$_id" },
+                    pipeline: [
+                        {
+                        $match: {
+                            $expr: { $eq: ["$Listing", "$$listingid"] }
+                        }
+                        },
+                        { $sort: { createdAt: -1 } },
+                        { $limit: 1 }
+                    ],
+                    as: "images"
+                    }
+                },
+                
+            ])
+            
+            const totalListing = await Listing.countDocuments(query);
+            resolve({
+                status: "OK",
+                message: "SUCCESS",
+                data: AllListing,
+                total: totalListing,
+                pageCurrent: Number(page),
+                totalPage: Math.ceil(totalListing / limit)
+            })
+        }catch(e){
+            console.log(e);
+            reject(e);
+        }
+    })
+}
 module.exports = {
-    getAllHome
+    getAllHome,
+    getAllListingRelated
 }

@@ -11,7 +11,24 @@ let getHomePage = async(req, res) => {
         })
     }
 }
-
+let getListingRelated = async (req,res) => {
+    try {
+        const {limit,page,CommuneID,CityID} = req.query;
+        if(!limit || !page || !CommuneID || !CityID){
+            return res.status(200).json({
+                status: "error",
+                message: "The input is required"
+            });
+        }
+        const response = await HomeService.getAllListingRelated(limit,page,CommuneID,CityID);
+        return res.status(200).json(response);
+    } catch(e){
+        return res.status(404).json({
+            message:e
+        })
+    }
+}
 module.exports = {
-    getHomePage
+    getHomePage,
+    getListingRelated
 };

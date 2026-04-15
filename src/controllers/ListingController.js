@@ -2,14 +2,14 @@ import ListingService from "../services/ListingService.js";
 
 const createListing = async(req,res) => {
     try{
-        const {Title,Description,Price,numberhouse,CityID,CommuneID,
+        const {Title,Description,Price,numberhouse,City,Commune,
                 horizontal,vertical,front_street,floor,bedroom,bathroom,Toilet,
-                Legal,User,CatagoryProperty
+                Legal,User,CatagoryProperty, Type
         } = req.body;
-        if(!Title || !Description || !Price || !numberhouse || !CommuneID || !CityID || !horizontal || !vertical || !front_street || !floor
-            || !bedroom || !bathroom || !Toilet || !Legal || !User || !CatagoryProperty
+        if(!Title || !Description || !Price || !numberhouse || !Commune || !City || !horizontal || !vertical || !front_street || !floor
+            || !bedroom || !bathroom || !Toilet || !Legal || !User || !CatagoryProperty || !Type
         ) {
-            return res.status(200).json({
+            return res.status(200).json({ 
                 status: "error",
                 message: "The input is required"
             });
