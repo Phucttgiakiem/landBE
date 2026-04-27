@@ -3,7 +3,7 @@ const ListingSchema = new mongoose.Schema(
     {
         Title: {type: String, required: true},
         Description: {type: String, required: true},
-        Price: {type: Number, required: true},
+        Price: {type: Number, required: true,default: 0},
         Address: {
             numberhouse: {type: String, required: true},
             Commune: {
@@ -15,8 +15,8 @@ const ListingSchema = new mongoose.Schema(
                 name: {type:String, required: true},
             },
         },
-        horizontal: {type: String, required:true},
-        vertical: {type: String, required:true},
+        horizontal: {type: Number, required:true},
+        vertical: {type: Number, required:true},
         front_street: {type: String, required:true},
         floor: {type:Number, required:true},
         bedroom: {type:Number, required:true},

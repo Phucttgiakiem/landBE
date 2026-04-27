@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import {Listing} from "../models/Listingmodel.js"
 import ImagePtService from "../services/ImagePtService.js";
+import { normalize } from "../utils/Text.js";
 const createListing = (data,files) => {
     return new Promise(async (resolve, reject) => {
          const {Title,Description,Price,numberhouse,Commune,City,
@@ -247,7 +248,7 @@ const getAllListing = (limit,page,sort,filters) => {
                                     .sort(sortObject)
                                     .skip((page - 1) * limit)
                                     .limit(limit);
-            const totalListing = await Listing.countDocuments(query).where("isDeleted").ne(true);
+            const totalListing = await Listing.countDocuments(query);
             const countitemdelete = await Listing.countDocuments({isDeleted: true});
             
 

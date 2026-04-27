@@ -55,13 +55,39 @@ const updateCatagoryPt = (id, data) => {
 const getAllCatagoryPt = () => {
     return new Promise(async (resolve, reject) => {
         try {
-            const allCatagoryPt = await CatagoryProperty.find();
+            const allCatagoryPt = await CatagoryProperty.aggregate([
+                {
+                    $group: {
+                        _id: "$Type",
+                        TypeSlug: { $first: "$TypeSlug" },
+                        items: {$push: "$$ROOT"}
+                    }
+                },
+                {
+                    $sort: { _id: -1 } 
+                }
+            ]);
             resolve({
                 status: "OK",
                 message: "SUCCESS",
                 data: allCatagoryPt
             });
         } catch (e) {
+            console.log(e);
+            reject(e);
+        }
+    })
+}
+const getAllCatagorywithType = (typeListing) => {
+    return new Promise(async (resolve,reject) => {
+        try {
+            const list = await CatagoryProperty.find({TypeSlug:typeListing});
+            resolve({
+                status: "OK",
+                message: "SUCCESS",
+                data: list
+            })
+        } catch(e){
             reject(e);
         }
     })
@@ -90,5 +116,6 @@ module.exports = {
     createCatagoryPt,
     updateCatagoryPt,
     getAllCatagoryPt,
-    deleteCatagoryPt
+    deleteCatagoryPt,
+    getAllCatagorywithType
 }

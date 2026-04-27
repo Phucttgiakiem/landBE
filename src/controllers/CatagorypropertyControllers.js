@@ -63,9 +63,27 @@ const deleteCatagoryProperty = async (req, res) => {
         })
     }
 }
+const getAllCatagorywithType = async (req,res) => {
+    try {
+        const typelisting = req.query.typelisting;
+        if(!typelisting){
+            return res.status(200).json({
+                status: "error",
+                message: "The field is required"
+            });
+        }
+        const response = await CatagoryPtService.getAllCatagorywithType(typelisting);
+        return res.status(200).json(response);
+    } catch(e) {
+        return res.status(404).json({
+            message: e
+        })
+    }
+}
 module.exports = {
     createCatagoryProperty,
     updateCatagoryProperty,
     getAllCatagoryProperty,
-    deleteCatagoryProperty
+    deleteCatagoryProperty,
+    getAllCatagorywithType
 }
