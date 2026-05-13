@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import {Listing} from "../models/Listingmodel.js"
 import ImagePtService from "../services/ImagePtService.js";
+import FavoriteService from "../services/FavoriteService.js";
 import { normalize } from "../utils/Text.js";
 const createListing = (data,files) => {
     return new Promise(async (resolve, reject) => {
@@ -359,6 +360,24 @@ const getDetailsListing = (id) => {
         }
     })
 }
+
+const getnewlistpropertytopfive = (iduser) => {
+    return new Promise(async (resolve,reject) => {
+        try {
+            const list = await Listing
+                    .find({ User: iduser })
+                    .sort({ createdAt: -1 })
+                    .limit(5);
+            resolve({
+                status: "OK",
+                message: "SUCCESS",
+                data: list
+            })
+        }catch(err){
+            reject(err);
+        }
+    })
+}
 module.exports = {
     createListing,
     updateListing,
@@ -367,5 +386,6 @@ module.exports = {
     getDetailsListing,
     softDeleteListing,
     getAllListingDeleted,
-    restoreListing 
+    restoreListing,
+    getnewlistpropertytopfive 
 }

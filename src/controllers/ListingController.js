@@ -135,6 +135,7 @@ const getDetailListing = async(req,res) => {
         })
     }
 }
+
 module.exports = {
     createListing,
     deleteListing,
@@ -143,5 +144,5 @@ module.exports = {
     getDetailListing,
     getAllmeListing,
     getAllListingDeleted,
-    restoreListing
+    restoreListing,
 }

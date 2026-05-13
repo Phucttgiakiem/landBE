@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 const createUser = (newUser) => {
     return new Promise(async (resolve, reject) => {
         
-        const { fullname, email, password, phone, address } = newUser;
+        const { fullname, email, password, phone, address,typeuser } = newUser;
         try {
             const checkUser = await Users.findOne({ email: email });
             if (checkUser !== null) {
@@ -23,7 +23,7 @@ const createUser = (newUser) => {
                 phone,
                 address,
                 image: 'unknown',
-                role: 'watcher'
+                role: typeuser
             });
             if (createdUser) {
                 resolve({

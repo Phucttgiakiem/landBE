@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
-import {Listing} from "../models/Listingmodel.js"
-const getAllHome = () => {
+import {Listing} from "../models/Listingmodel.js";
+import {getFavoritelistofuser} from "../services/FavoriteService.js";
+import {attachFavorite} from "../utils/Functioncustom.js";
+const getAllHome = (userId) => {
     return new Promise(async(resolve,reject) => {
         try {
             const featured = await Listing.aggregate([
@@ -150,12 +152,22 @@ const getAllHome = () => {
                 name: city.name,
                 count: resultMap[city._id] || 0
             }));
+            let featuredWithFav = null;
+            let latestWithFav = null;
+            let cheapWithFav = null;
+            if(userId) {
+                const favList = await getFavoritelistofuser(userId);
+                const favSet = new Set(favList.map(f => f.listingId.toString()));
+                featuredWithFav = await attachFavorite(featured,favSet);
+                latestWithFav = await attachFavorite(latest,favSet);
+                cheapWithFav = await attachFavorite(cheap,favSet);
+            }
             resolve({
                 status: "OK",
                 message: "SUCCESS",
-                featured: featured,
-                latest: latest,
-                cheap: cheap,
+                featured: !userId ? featured : featuredWithFav,
+                latest: !userId ? latest : latestWithFav,
+                cheap: !userId ? cheap : cheapWithFav,
                 countnews: countnews,
             })
         }catch(e){
