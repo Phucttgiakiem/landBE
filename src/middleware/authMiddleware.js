@@ -3,46 +3,65 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const authMiddleWare = (req,res,next) => {
-    //console.log("authMiddleware called",req.headers.token);
-    const token = req.headers.token.split(' ')[1];
-    jwt.verify(token, process.env.ACCESS_TOKEN,function(err,user){
-        if(err){
-            return res.status(404).json({
+    try {
+        const authHeader = req.headers.authorization;
+        if (!authHeader) {
+            return res.status(401).json({
                 status: "error",
-                message: "the authentication",
+                message: "Không có token"
+            });
+        }
+        const token = authHeader.split(' ')[1];
+        const decoded = jwt.verify(token,process.env.ACCESS_TOKEN);
+        req.user = decoded;
+              
+        next();
+        }catch(err){
+            console.log(err);
+            return res.status(401).json({
+                status: "error",
+                message: "token không hợp lệ"
             })
         }
-        if(user?.isAdmin == "Admin"){
-            next();
-        }else {
-            return res.status(404).json({
-                status: "error",
-                message: "The authentication",
-            })
-        }
-    })
 }
-const authUserMiddleWare = (req,res,next) => {
-    const token = req.headers.token.split(' ')[1];
+const optionalAuth = (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (authHeader) {
+      const token = authHeader.split(" ")[1];
+      const decoded = jwt.verify(token, process.env.ACCESS_TOKEN);
+      req.user = decoded;
+    }
+    next(); // LUÔN cho qua
+  } catch (err) {
+    next(); // token lỗi cũng cho qua
+  }
+};
+const authorizeRoles = (allowedRoles = []) => {
+    return (req,res,next) => {
+        if(allowedRoles.length && !allowedRoles.includes(req.user.role)){
+            return res.status(403).json({
+                status: "error",
+                message: "Không đủ quyền"
+            });
+        }
+        next();
+    }
+}
+const authorizeOwner = (req,res,next) => {
     const userId = req.params.id || req.body.id;
-    jwt.verify(token, process.env.ACCESS_TOKEN,function(err,user){
-        if(err){
-            return res.status(404).json({
-                status: "error",
-                message: "the authentication",
-            })
-        }
-        if(user?.id === userId){
-            next();
-        }else {
-            return res.status(404).json({
-                status: "error",
-                message: "The authentication",
-            })
-        }
-    })
+    if(req.user.id !== userId){
+        return res.status(403).json({
+            status: "error",
+            message: "Không phải tài khoản của bạn"
+        });
+    }
+    next();
 }
 module.exports = {
     authMiddleWare,
-    authUserMiddleWare
+    authorizeOwner,
+    authorizeRoles,
+    optionalAuth
 }

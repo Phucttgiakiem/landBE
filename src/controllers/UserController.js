@@ -4,11 +4,12 @@ import JWTService from "../services/JwtService.js";
 
 const createUser = async (req, res) => {
     try {
-        const {fullname, email, password,confirmPassword,phone,address} = req.body;
+        //console.log(req.body);
+        const {fullname, email, password,confirmPassword,phone,address,typeuser} = req.body;
         const reg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         const isEmailValid = reg.test(email);
        // console.log("param: ",req.body);
-        if(!fullname || !email || !password || !confirmPassword || !phone || !address) {
+        if(!fullname || !email || !password || !confirmPassword || !phone || !address || !typeuser) {
             return res.status(200).json({
                 status: "error",
                 message: "The input is required"
@@ -27,6 +28,7 @@ const createUser = async (req, res) => {
        const response =  await UserService.createUser(req.body);
        return res.status(200).json(response);
     } catch (e) {
+        console.log(e);
         return res.status(404).json({
             message: e
         })

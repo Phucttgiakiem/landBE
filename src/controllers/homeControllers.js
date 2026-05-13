@@ -1,7 +1,8 @@
 import HomeService from "../services/HomeService.js";
 let getHomePage = async(req, res) => {
     try {
-        const response = await HomeService.getAllHome();
+        const Iduser = req.user?.id || null
+        const response = await HomeService.getAllHome(Iduser);
         return res.status(200).json(response);
     }
     catch(e){
