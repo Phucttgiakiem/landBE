@@ -8,10 +8,12 @@ router.post("/sign-in",userController.loginUser);
 router.put("/resetpassword-user",userController.resetpass);
 router.put("/change-password/:id",authorizeOwner,userController.changePass);
 router.post("/log-out",userController.logoutUser);
-router.put('/update-user/:id',authorizeOwner,userController.updateUser);
+router.put('/update-user/:id',authMiddleWare,authorizeOwner,userController.updateUser);
 router.delete("/delete-user/:id",authMiddleWare,authorizeOwner, userController.deleteUser);
 router.get('/getAll',authMiddleWare,authorizeRoles(["admin"]),userController.getAllUser);
+router.get('/getAllowner',authMiddleWare,authorizeRoles(["admin"]),userController.getAllowner);
 router.get('/get-details/:id',authMiddleWare,authorizeOwner,userController.getDetailsUser);
+router.get('/get-detailUser/:id',authMiddleWare,authorizeRoles(["admin"]),userController.getDetailsUser);
 router.post('/refresh-token',userController.refreshToken);
 
 module.exports = router;

@@ -85,8 +85,17 @@ const updateUser = (id,data) => {
                     message: "the user is not defined"
                 });
             }
-            const {email,name,phone,address} = data;
-            const updatedUser = await Users.findByIdAndUpdate(id,{email,fullname: name,phone,address}, { new: true });
+            const {email,name,phone,address,dateofbirth,Idnumber,idIssuedDate,idIssuedPlace} = data;
+            const updatedUser = await Users.findByIdAndUpdate(id,{
+                email,
+                fullname: name,
+                phone,
+                address,
+                dateOfBirth:dateofbirth,
+                idNumber:Idnumber,
+                idIssuedDate,
+                idIssuedPlace
+            }, { new: true });
             resolve({
                 status: "OK",
                 message: "SUCCESS",
@@ -165,16 +174,63 @@ const ChangePass = (id, newpass)=> {
         }
     })
 }
-const getAllUser = () => {
+const getAllUser = (limit,page,sort,filter,keyword) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const allUsers = await Users.find();
+            const query = {
+                role: { $ne: "admin" }
+            };
+
+            if (filter.length > 0) {
+                query.role.$in = filter;
+            }
+
+            if (keyword) {
+                query.fullname = { $regex: keyword, $options: "i" };
+            }
+            const sortOption = {};
+
+            if (sort?.field) {
+                sortOption[sort.field] =
+                    sort.order === "ascend" ? 1 : -1;
+            }
+            const allUsers = await Users.find(query)
+                .sort(sortOption)
+                .skip((page - 1) * limit)
+                .limit(limit);
+
+            const totalUser = await Users.countDocuments(query);
             resolve({
                 status: "OK",
                 message: "SUCCESS",
-                data: allUsers
+                data: allUsers,
+                pageCurrent: page,
+                totalPage:Math.ceil(totalUser/limit),
+                totalitem: totalUser,
             });
         } catch (e) {
+            reject(e);
+        }
+    })
+}
+const getAllowner = () => {
+    return new Promise(async (resolve,reject) => {
+        try {
+            const query = await Users.find({role: { $in: ['admin', 'sell-user']}}).select({_id: 1,fullname: 1,phone: 1,role: 1});
+            if(query.length > 0){
+                resolve({
+                    status: "OK",
+                    message: "success",
+                    owner: query
+                });
+            }else {
+                resolve({
+                    status: "OK",
+                    message: "không tìm thấy owner",
+                    owner: []
+                });
+            }
+        } catch(e){
             reject(e);
         }
     })
@@ -208,5 +264,6 @@ module.exports = {
     resetpass,
     ChangePass,
     getAllUser,
+    getAllowner,
     getDetailsUser,
 }

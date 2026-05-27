@@ -378,6 +378,79 @@ const getnewlistpropertytopfive = (iduser) => {
         }
     })
 }
+const getTitleproperty = (limit,keyword,typeproperty) => {
+    return new Promise(async (resolve,reject) => {
+        try {
+
+            const result = await Listing.aggregate([
+
+                {
+                    $match: {
+                        isDeleted: false,
+                        Title: {
+                            $regex: keyword,
+                            $options: "i"
+                        }
+                    }
+                },
+
+                {
+                    $lookup: {
+                        from: "catagorypropertys",
+
+                        localField: "CatagoryProperty",
+
+                        foreignField: "_id",
+
+                        as: "Catagory"
+                    }
+                },
+
+                {
+                    $unwind: "$Catagory"
+                },
+
+                {
+                    $match: {
+                        "Catagory.Type": typeproperty
+                    }
+                },
+
+                {
+                    $project: {
+                        _id: 1,
+                        Title: 1
+                    }
+                },
+
+                {
+                    $sort: {
+                        createdAt: -1
+                    }
+                },
+
+                {
+                    $limit: limit
+                }
+
+            ]);
+            if(result.length > 0) {
+                resolve({
+                    status: "OK",
+                    message: "success",
+                    result
+                })
+            }else
+            resolve({
+                status: "OK",
+                message: "cannot found information",
+                result: []
+            });
+        } catch(err){
+            reject(err);
+        }
+    })
+}
 module.exports = {
     createListing,
     updateListing,
@@ -387,5 +460,6 @@ module.exports = {
     softDeleteListing,
     getAllListingDeleted,
     restoreListing,
-    getnewlistpropertytopfive 
+    getnewlistpropertytopfive,
+    getTitleproperty
 }

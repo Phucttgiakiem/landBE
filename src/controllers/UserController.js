@@ -71,7 +71,7 @@ const updateUser = async (req, res) => {
         const response = await UserService.updateUser(userId, data);
         return res.status(200).json(response);
     }catch(e){
-        return res.status(404).json({
+        return res.status(500).json({
             message: e
         })
     }
@@ -156,10 +156,16 @@ const changePass = async (req,res) => {
 }
 const getAllUser = async (req, res) => {
     try {
-        const response = await UserService.getAllUser();
+        const {limit,page,sort,filter,keyword} = req.query;
+
+        const sorted = JSON.parse(sort || "{}");
+        const filtered = JSON.parse(filter || "[]");
+
+        const response = await UserService.getAllUser(Number(limit),Number(page),sorted,filtered,keyword);
         return res.status(200).json(response)
     }catch(e){
-        return res.status(404).json({
+        console.log(e);
+        return res.status(500).json({
             message: e
         })
     }
@@ -177,6 +183,16 @@ const getDetailsUser = async (req,res) => {
         return res.status(200).json(response);
     }catch(e){
         return res.status(404).json({
+            message: e
+        })
+    }
+}
+const getAllowner = async (req,res) => {
+    try {
+        const result = await UserService.getAllowner();
+        return res.status(200).json(result);
+    } catch(e){
+        return res.status(500).json({
             message: e
         })
     }
@@ -222,6 +238,7 @@ module.exports = {
     resetpass,
     changePass,
     getAllUser,
+    getAllowner,
     getDetailsUser,
     refreshToken,
     logoutUser
