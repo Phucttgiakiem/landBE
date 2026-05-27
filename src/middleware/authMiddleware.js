@@ -40,7 +40,7 @@ const optionalAuth = (req, res, next) => {
 };
 const authorizeRoles = (allowedRoles = []) => {
     return (req,res,next) => {
-        if(allowedRoles.length && !allowedRoles.includes(req.user.role)){
+        if(allowedRoles.length && !allowedRoles.includes(req.user.isAdmin)){
             return res.status(403).json({
                 status: "error",
                 message: "Không đủ quyền"

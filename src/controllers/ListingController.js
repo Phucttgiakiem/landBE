@@ -26,8 +26,6 @@ const updateListing = async (req,res) => {
     try {
         const Listingid = req.params.id;
         let data = req.body;
-       // console.log("thông tin client gửi lên: ",data);
-       
         if(!Listingid) {
             return res.status(200).json({
                 status: "error",
@@ -135,7 +133,20 @@ const getDetailListing = async(req,res) => {
         })
     }
 }
-
+const getTitleproperty = async( req,res) => {
+    try {
+        
+        const {limit,keyword,typeproperty} = req.query;
+        console.log(req.query);
+        const response = await ListingService.getTitleproperty(Number(limit) || 8,keyword,typeproperty);
+        return res.status(200).json(response);
+    }catch(e){
+        return res.status(500).json({
+            message: e
+        })
+    }
+    
+}
 module.exports = {
     createListing,
     deleteListing,
@@ -145,4 +156,5 @@ module.exports = {
     getAllmeListing,
     getAllListingDeleted,
     restoreListing,
+    getTitleproperty
 }
