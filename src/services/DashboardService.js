@@ -74,7 +74,6 @@ const getAdminOverview = ( ) => {
                 {
                     $match: {
                         createdAt: { $gte: start12Months },
-                        isDeleted:false,
                     }
                 },
                 {
@@ -169,7 +168,7 @@ const getSellerOverview = (iduser) => {
         },
         { $sort: { _id: 1 } },
 
-        // 🔥 fill missing month
+        //  fill missing month
         {
           $densify: {
             field: "_id",
@@ -199,78 +198,6 @@ const getSellerOverview = (iduser) => {
         }
       ]);
 
-      // ===== FAVORITE 3 THÁNG =====
-      const start3Months = new Date();
-      start3Months.setMonth(now.getMonth() - 2);
-      start3Months.setDate(1);
-      start3Months.setHours(0, 0, 0, 0);
-
-      const totalfavoriteinthreeMonth = await Listing.aggregate([
-        {
-          $match: {
-            User: userObjectId,
-            isDeleted:false,
-          }
-        },
-        {
-          $lookup: {
-            from: "favorites",
-            localField: "_id",
-            foreignField: "listingId",
-            as: "favorites"
-          }
-        },
-        { $unwind: "$favorites" },
-
-        {
-          $match: {
-            "favorites.createdAt": { $gte: start3Months }
-          }
-        },
-
-        {
-          $group: {
-            _id: {
-              $dateTrunc: {
-                date: "$favorites.createdAt",
-                unit: "month"
-              }
-            },
-            totalLikes: { $sum: 1 }
-          }
-        },
-
-        { $sort: { _id: 1 } },
-
-        // 🔥 fill missing
-        {
-          $densify: {
-            field: "_id",
-            range: {
-              step: 1,
-              unit: "month",
-              bounds: [start3Months, now]
-            }
-          }
-        },
-        {
-          $fill: {
-            output: {
-              totalLikes: { value: 0 }
-            }
-          }
-        },
-
-        {
-          $project: {
-            _id: 0,
-            month: {
-              $dateToString: { format: "%m/%Y", date: "$_id" }
-            },
-            value: "$totalLikes"
-          }
-        }
-      ]);
 
       resolve({
         status: "OK",
@@ -279,7 +206,6 @@ const getSellerOverview = (iduser) => {
 
         // dùng trực tiếp cho chart
         propertyChart: propertyByMonth,
-        favoriteChart: totalfavoriteinthreeMonth
       });
 
     } catch (err) {

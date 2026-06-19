@@ -11,6 +11,7 @@
   "description": "",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.427.0",
+    "@getbrevo/brevo": "^5.0.4",
     "bcrypt": "^6.0.0",
     "body-parser": "^2.2.0",
     "cookie-parser": "^1.4.7",
@@ -19,7 +20,8 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.17.0",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "nodemailer": "^8.0.10"
   },
   "devDependencies": {
     "@babel/core": "^7.28.0",

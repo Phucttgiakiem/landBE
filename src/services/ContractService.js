@@ -69,8 +69,8 @@ const createContract = (iduser,data) => {
                     price:price,
                     rentalInfo:{
                         deposit:deposit,
-                        startDate: convertdateformongodb(startdate),
-                        endDate: convertdateformongodb(enddate)
+                        startDate: startdate,
+                        endDate: enddate
                     },
                     status: statusContract,
                     ownerSnapshot: {
@@ -133,7 +133,6 @@ const createContract = (iduser,data) => {
                 })
             }
         } catch(err){
-            console.log(err);
             reject(err);
         }
     })
@@ -141,26 +140,27 @@ const createContract = (iduser,data) => {
 const updateContract = (idcontract,userId,data) => {
     return new Promise (async(resolve,reject) => {
         try {
+            let response = {};
             const {idproperty,idbuyer,idtenant,typecontract,price,deposit,startdate,enddate,
                 paymentMethod,transferDate,statusContract,fullnamebuyer,idNumberbuyer,addressbuyer,fullnameowner,idNumberowner,addressowner,
                 fullnametenant,idNumbertenant,addresstenant,titleproperty,addressproperty,areaproperty,term
             } = data;
             let contract = await Contract.findById(idcontract);
             if(!contract){
-                resolve({
+                response = {
                     status: "error",
                     message: "Không tìm thấy hợp đồng"
-                })
+                }
             }
-            if(typecontract === "rent"){
+            else if(typecontract === "rent"){
                 contract.listingId = idproperty;
                 contract.typeContract = typecontract;
                 contract.ownerId = userId;
                 contract.price = price;
                 contract.rentalInfo = {
                     deposit:deposit,
-                    startDate: convertdateformongodb(startdate),
-                    endDate: convertdateformongodb(enddate)
+                    startDate: startdate,
+                    endDate: enddate
                 }
                 contract.status = statusContract;
                 contract.ownerSnapshot = {
@@ -197,18 +197,18 @@ const updateContract = (idcontract,userId,data) => {
             }
             const resultcontract = await contract.save();
             if(resultcontract){
-                resolve({   
+                response ={   
                     status: "OK",
                     message: "Cập nhật hợp đồng thành công"
-                });
+                };
             }else {
-                resolve({
+                response = {
                     status: "error",
                     message: "Cập nhật hợp đồng không thành công, thử lại !!!"
-                })
+                }
             }
+            resolve(response);
         }catch(err){
-            console.log(err);
             reject(err);
         }
     })

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import {Listing} from "../models/Listingmodel.js";
 import {getFavoritelistofuser} from "../services/FavoriteService.js";
 import {attachFavorite} from "../utils/Functioncustom.js";
-const getAllHome = (userId) => {
+const getAllHome = () => {
     return new Promise(async(resolve,reject) => {
         try {
             const featured = await Listing.aggregate([
@@ -11,7 +11,11 @@ const getAllHome = (userId) => {
                     approval_status: "đã xác thực",
                     visibility_status: "công khai",
                     type:"vip",
+                    ExpiredAt: {
+                        $gte: new Date()
+                    },
                     isDeleted: false,
+
                     }
                 },
                 {
@@ -48,6 +52,9 @@ const getAllHome = (userId) => {
                     $match: {
                         approval_status: "đã xác thực",
                         visibility_status: "công khai",
+                         ExpiredAt: {
+                            $gte: new Date()
+                        },
                         isDeleted: false
                     }
                 },
@@ -86,6 +93,9 @@ const getAllHome = (userId) => {
                         Price: { $lte: 8000000 },
                         approval_status: "đã xác thực",
                         visibility_status: "công khai",
+                         ExpiredAt: {
+                            $gte: new Date()
+                        },
                         isDeleted: false
                     }
                 },
@@ -131,6 +141,9 @@ const getAllHome = (userId) => {
                     $match: {
                     approval_status: "đã xác thực",
                     visibility_status: "công khai",
+                    ExpiredAt: {
+                        $gte: new Date()
+                    },
                     isDeleted: false,
                     "Address.City.id": { $in: cityIds }
                     }
@@ -152,22 +165,12 @@ const getAllHome = (userId) => {
                 name: city.name,
                 count: resultMap[city._id] || 0
             }));
-            let featuredWithFav = null;
-            let latestWithFav = null;
-            let cheapWithFav = null;
-            if(userId) {
-                const favList = await getFavoritelistofuser(userId);
-                const favSet = new Set(favList.map(f => f.listingId.toString()));
-                featuredWithFav = await attachFavorite(featured,favSet);
-                latestWithFav = await attachFavorite(latest,favSet);
-                cheapWithFav = await attachFavorite(cheap,favSet);
-            }
             resolve({
                 status: "OK",
                 message: "SUCCESS",
-                featured: !userId ? featured : featuredWithFav,
-                latest: !userId ? latest : latestWithFav,
-                cheap: !userId ? cheap : cheapWithFav,
+                featured: featured,
+                latest: latest,
+                cheap: cheap,
                 countnews: countnews,
             })
         }catch(e){
@@ -553,8 +556,124 @@ const getListingFillter = (limit,page,sorted,filters) => {
         }
     })
 }
+const getAllpropertyofbroker = (idowner,filter,page,limit) => {
+    return new Promise(async (resolve,reject) => {
+        try {
+            const skip = (page - 1) * limit;
+            const result = await Listing.aggregate([
+                {
+                    $match: {
+                        isDeleted: false,
+                        User: new mongoose.Types.ObjectId(idowner),
+                        approval_status: "đã xác thực",
+                        visibility_status: "công khai"
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "catagorypropertys",
+                        localField: "CatagoryProperty",
+                        foreignField: "_id",
+                        as: "category"
+                    }
+                },
+                {
+                    $unwind: "$category"
+                },
+                {
+                    $match: {
+                        "category.Type": filter
+                    }
+                },
+                {
+                    $facet: {
+                        data: [
+                            {
+                                $sort: {
+                                    createdAt: -1
+                                }
+                            },
+                            {
+                                $skip: skip
+                            },
+                            {
+                                $limit: limit
+                            },
+                            {
+                                $lookup: {
+                                    from: "imagepropertys",
+                                    let: {
+                                        listingId: "$_id"
+                                    },
+                                    pipeline: [
+                                        {
+                                            $match: {
+                                                $expr: {
+                                                    $eq: ["$Listing", "$$listingId"]
+                                                }
+                                            }
+                                        },
+                                        {
+                                            $sort: {
+                                                createdAt: 1
+                                            }
+                                        },
+                                        {
+                                            $limit: 1
+                                        }
+                                    ],
+                                    as: "thumbnail"
+                                }
+                            },
+                            {
+                                $unwind: {
+                                    path: "$thumbnail",
+                                    preserveNullAndEmptyArrays: true
+                                }
+                            },
+                            {
+                                $project: {
+                                    _id: 1,
+                                    Title: 1,
+                                    Price: 1,
+                                    Address: 1,
+                                    horizontal: 1,
+                                    vertical: 1,
+                                    type: 1,
+                                    createdAt: 1,
+                                    propertyType: "$category.Type",
+                                    thumbnail: {
+                                        $ifNull: ["$thumbnail.URL", "no-image"]
+                                    }
+                                }
+                            }
+                        ],
+                        total: [
+                            {
+                                $count: "count"
+                            }
+                        ]
+                    }
+                }
+            ]);
+            const listings = result[0].data;
+            const totalListing = result[0].total[0]?.count || 0;
+            resolve({
+                status: "OK",
+                message: "SUCCESS",
+                listings,
+                total: totalListing,
+                pageCurrent: page,
+                totalPage: Math.ceil(totalListing / limit)
+            })
+        } catch(err){
+            reject(err);
+        }
+    })
+}
 module.exports = {
     getAllHome,
     getAllListingRelated,
-    getListingFillter
+    getListingFillter,
+    getAllpropertyofbroker
 }
