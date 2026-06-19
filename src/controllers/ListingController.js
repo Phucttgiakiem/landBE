@@ -27,16 +27,18 @@ const updateListing = async (req,res) => {
         const Listingid = req.params.id;
         let data = req.body;
         if(!Listingid) {
-            return res.status(200).json({
+            return res.status(400).json({
                 status: "error",
-                message: "The listingid is required"
+                message: "mã bài đăng không được bỏ qua"
             })
         }
         const response = await ListingService.updateListing(Listingid,data,req.files);
+        if(response.status === "error"){
+            return res.status(400).json(response);
+        }
         return res.status(200).json(response);
     }catch(e){
-        console.log(e);
-        return res.status(404).json({
+        return res.status(500).json({
             message: e
         })
     }
@@ -44,8 +46,9 @@ const updateListing = async (req,res) => {
 const deleteListing = async (req, res) => {
     try {
         const {arrid,typedelete} = req.body;
+        console.log(req.body);
         if(arrid.length === 0){
-            return res.status(200).json({
+            return res.status(400).json({
                 status: "error",
                 message: "The arrayId is required"
             });
@@ -57,14 +60,15 @@ const deleteListing = async (req, res) => {
         const response = await ListingService.deleteListing(arrid);
         return res.status(200).json(response);
     }catch(e){
-        return res.status(404).json({
+        console.log(e);
+        return res.status(500).json({
             message: e
         })
     }
 }
 const restoreListing = async (req,res) => {
     try {
-        const {arrid} = req.body;
+        const arrid = req.body;
         if(arrid.length === 0){
             return res.status(200).json({
                 status: "error",
@@ -74,19 +78,21 @@ const restoreListing = async (req,res) => {
         const response = await ListingService.restoreListing(arrid);
         return res.status(200).json(response);
     }catch(e){
-        return res.status(404).json({
+        console.log(e);
+        return res.status(500).json({
             message: e
         })
     }
 }
 const getAllListingDeleted = async (req, res) => {
     try {
-        const { limit,page,sort} = req.query;
+        const {limit,page,sort} = req.query;
+        const User = req.user.id;
         const parsedSort = sort ? JSON.parse(sort) : null;
-        const response = await ListingService.getAllListingDeleted(Number(limit) || 8,Number(page) || 0,parsedSort);
+        const response = await ListingService.getAllListingDeleted(Number(limit) || 8,Number(page) || 0,parsedSort,User);
         return res.status(200).json(response);
     }catch(e){
-        return res.status(404).json({
+        return res.status(500).json({
             message: e
         });
     }
@@ -119,8 +125,9 @@ const getAllmeListing = async (req,res) => {
 const getDetailListing = async(req,res) => {
     try {
             const ListingId = req.params.id;
+
             if(!ListingId){
-                return res.status(200).json({
+                return res.status(400).json({
                     status: "error",
                     message: "The ListingId is required"
                 });
@@ -128,7 +135,7 @@ const getDetailListing = async(req,res) => {
             const response = await ListingService.getDetailsListing(ListingId);
             return res.status(200).json(response);
     }catch(e){
-        return res.status(404).json({
+        return res.status(500).json({
             message: e
         })
     }
@@ -147,6 +154,7 @@ const getTitleproperty = async( req,res) => {
     }
     
 }
+
 module.exports = {
     createListing,
     deleteListing,
@@ -156,5 +164,6 @@ module.exports = {
     getAllmeListing,
     getAllListingDeleted,
     restoreListing,
-    getTitleproperty
+    getTitleproperty,
+    
 }

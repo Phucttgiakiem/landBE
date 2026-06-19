@@ -1,13 +1,12 @@
 import HomeService from "../services/HomeService.js";
 let getHomePage = async(req, res) => {
     try {
-        const Iduser = req.user?.id || null
-        const response = await HomeService.getAllHome(Iduser);
+        const response = await HomeService.getAllHome();
         return res.status(200).json(response);
     }
     catch(e){
         console.error("Error in getHomePage:", e);
-        return res.status(404).json({
+        return res.status(500).json({
             message: e
         })
     }
@@ -50,16 +49,30 @@ let getListingFilter = async (req,res) => {
             }
         });
         const response = await HomeService.getListingFillter(Number(limit) || 8,Number(page) || 0,sort,filters);
-            return res.status(200).json(response);
+        
+        return res.status(200).json(response);
     } catch(e){
         console.log(e);
-        return res.status(404).json({
+        return res.status(500).json({
             message: e
+        })
+    }
+}
+const getAllpropertyofbroker = async (req,res) => {
+    try {
+        const {page,limit,filter,idowner} = req.query;
+        const response = await HomeService.getAllpropertyofbroker(idowner,filter,Number(page),Number(limit));
+        return res.status(200).json(response);
+    }catch(e){
+        console.log(e);
+        return res.status(500).json({
+            message:e
         })
     }
 }
 module.exports = {
     getHomePage,
     getListingRelated,
-    getListingFilter
+    getListingFilter,
+    getAllpropertyofbroker
 };

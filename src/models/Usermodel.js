@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema(
         idIssuedDate: {type:Date,default:new Date(0)},
         idIssuedPlace: {type:String,default: ""},
         role: {type: String, required: true, default: "user"},
+        isVerified: {type: Boolean, default: false},
     },
     {
         timestamps: true,

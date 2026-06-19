@@ -59,39 +59,42 @@ const createListing = (data,files) => {
 const updateListing = (id,data,files) => {
     return new Promise(async (resolve,reject) => {
         try{
+            let response = {}
             const checkListing = await Listing.findOne({ _id:id});
             if(checkListing === null){
-                resolve({
-                    status: "OK",
-                    message: "the listing is not defined"
-                })
-            }
-            // when update listing, any field another initial field, the field will be update
-            const listingObj = checkListing.toObject();
-            const updateData = {};
-           Object.keys(listingObj).forEach((field) => {
-                if (
-                    data[field] !== undefined &&
-                    listingObj[field] !== data[field]
-                ) {
-                    updateData[field] = data[field];
+                response = {
+                    status: "error",
+                    message: "không tìm thấy bài đăng bất động sản"
                 }
-            });
-            const updateListing = await Listing.findByIdAndUpdate(id,updateData,{new:true});
-            // update image listing
-            if(files && files.length > 0){
-                await ImagePtService.createImagePtmultip(files, id);
-            }
+            }else {
+                // when update listing, any field another initial field, the field will be update
+                const listingObj = checkListing.toObject();
+                const updateData = {};
+                Object.keys(listingObj).forEach((field) => {
+                        if (
+                            data[field] !== undefined &&
+                            listingObj[field] !== data[field]
+                        ) {
+                            updateData[field] = data[field];
+                        }
+                    });
+                    const updateListing = await Listing.findByIdAndUpdate(id,updateData,{new:true});
+                    // update image listing
+                    if(files && files.length > 0){
+                        await ImagePtService.createImagePtmultip(files, id);
+                    }
 
-            const removedImages = JSON.parse(data.removedImages)
-            if(removedImages && removedImages.length > 0){
-                await ImagePtService.deleteImagewithId(removedImages);
+                    const removedImages = JSON.parse(data.removedImages)
+                    if(removedImages && removedImages.length > 0){
+                        await ImagePtService.deleteImagewithId(removedImages);
+                    }
+                    response = {
+                        status: "OK",
+                        message: "SUCCESS",
+                        data: updateListing
+                    };
             }
-             resolve({
-                status: "OK",
-                message: "SUCCESS",
-                data: updateListing
-            });
+            resolve(response);
         }catch(e){
             reject(e);
         }
@@ -250,7 +253,8 @@ const getAllListing = (limit,page,sort,filters) => {
                                     .skip((page - 1) * limit)
                                     .limit(limit);
             const totalListing = await Listing.countDocuments(query);
-            const countitemdelete = await Listing.countDocuments({isDeleted: true});
+            const countitemdelete = await Listing.countDocuments({isDeleted: true
+                ,User:new mongoose.Types.ObjectId(parsedFilters.User)});
             
 
             resolve({
@@ -268,11 +272,11 @@ const getAllListing = (limit,page,sort,filters) => {
         }
     })
 }
-const getAllListingDeleted = (limit,page,sort) => {
+const getAllListingDeleted = (limit,page,sort,user) => {
     return new Promise(async (resolve,reject) => {
         try {
-            const totalListing = await Listing.countDocuments({isDeleted:true});
-            let queryBuilder = Listing.find({isDeleted:true})
+            const totalListing = await Listing.countDocuments({isDeleted:true,User:new mongoose.Types.ObjectId(user)});
+            let queryBuilder = Listing.find({isDeleted:true,User:new mongoose.Types.ObjectId(user)})
                 .limit(limit)
                 .skip((page - 1) * limit);
             if (sort && sort.field) {
@@ -327,6 +331,7 @@ const getDetailsListing = (id) => {
                                     fullname: 1,
                                     email: 1,
                                     phone: 1,
+                                    createdAt: 1,
                                 }
                             }
                         ],
@@ -341,7 +346,7 @@ const getDetailsListing = (id) => {
                 }
             ])
             if(data === null) {
-                resolve({
+              return resolve({
                     status: "OK",
                     message: "the listing is not defined"
                 });
@@ -355,7 +360,6 @@ const getDetailsListing = (id) => {
                 data: {...data[0]}
             });
         } catch (e) {
-            console.log(e);
             reject(e);
         }
     })
@@ -451,6 +455,7 @@ const getTitleproperty = (limit,keyword,typeproperty) => {
         }
     })
 }
+
 module.exports = {
     createListing,
     updateListing,
@@ -461,5 +466,5 @@ module.exports = {
     getAllListingDeleted,
     restoreListing,
     getnewlistpropertytopfive,
-    getTitleproperty
+    getTitleproperty,
 }
