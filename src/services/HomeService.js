@@ -237,7 +237,6 @@ const getAllListingRelated = (limit,page,CommuneID,CityID) => {
                 totalPage: Math.ceil(totalListing / limit)
             })
         }catch(e){
-            console.log(e);
             reject(e);
         }
     })
@@ -551,7 +550,6 @@ const getListingFillter = (limit,page,sorted,filters) => {
                 totalPage: Math.ceil(total / limit)
             })
         }catch(e){
-            console.log(e);
             reject(e);
         }
     })

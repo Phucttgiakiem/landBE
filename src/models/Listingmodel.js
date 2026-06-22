@@ -35,7 +35,7 @@ const ListingSchema = new mongoose.Schema(
             enum: ["công khai", "ẩn","bị khóa","hết hạn"],
             required:true},
         User: {type: mongoose.Schema.Types.ObjectId, ref: "users", required: true},
-        CatagoryProperty: {type: mongoose.Schema.Types.ObjectId, ref: "catagorypropertys", required: true},
+        CatagoryProperty: {type: mongoose.Schema.Types.ObjectId, ref: "catagorypropertys", default: null},
         type: {
             type: String,
             enum: ["normal", "vip"],

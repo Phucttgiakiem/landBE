@@ -60,7 +60,6 @@ const deleteListing = async (req, res) => {
         const response = await ListingService.deleteListing(arrid);
         return res.status(200).json(response);
     }catch(e){
-        console.log(e);
         return res.status(500).json({
             message: e
         })
@@ -78,7 +77,6 @@ const restoreListing = async (req,res) => {
         const response = await ListingService.restoreListing(arrid);
         return res.status(200).json(response);
     }catch(e){
-        console.log(e);
         return res.status(500).json({
             message: e
         })

@@ -5,7 +5,6 @@ let getHomePage = async(req, res) => {
         return res.status(200).json(response);
     }
     catch(e){
-        console.error("Error in getHomePage:", e);
         return res.status(500).json({
             message: e
         })
@@ -52,7 +51,6 @@ let getListingFilter = async (req,res) => {
         
         return res.status(200).json(response);
     } catch(e){
-        console.log(e);
         return res.status(500).json({
             message: e
         })
@@ -64,7 +62,6 @@ const getAllpropertyofbroker = async (req,res) => {
         const response = await HomeService.getAllpropertyofbroker(idowner,filter,Number(page),Number(limit));
         return res.status(200).json(response);
     }catch(e){
-        console.log(e);
         return res.status(500).json({
             message:e
         })

@@ -50,7 +50,6 @@ const createListing = (data,files) => {
                 message: "SUCCESS",
             });
         } catch (e) {
-            console.log(e);
             reject(e);
         }
     })
@@ -267,7 +266,6 @@ const getAllListing = (limit,page,sort,filters) => {
                 totalPage: Math.ceil(totalListing / limit)
             })
         }catch(e){
-            console.log(e);
             reject(e);
         }
     })

@@ -6,7 +6,6 @@ const getinfoforCreatecontract = async (req,res) => {
         const response = await ContractService.getinfoforCreatecontract(iduser);
         return res.status(200).json(response);
     } catch(err){
-        console.log(err);
         return res.status(500).json({
             message:err
         })
@@ -26,8 +25,8 @@ const createContract = async (req,res) => {
                 message: "các trường nhập không được để trống"
             });
         }
-        if((typecontract === "rent" && (!idproperty || !idtenant || !idNumbertenant || !startdate || !enddate || !deposit || !idNumberowner || !statusContract))||
-           ( typecontract === "sale" && (!idproperty || !idbuyer || !idNumberbuyer || !paymentMethod || !transferDate || !idNumberowner || !statusContract))
+        if((typecontract === "rent" && (!idproperty || !idtenant || !idNumbertenant || !startdate || !enddate || !deposit || !idNumberowner || !statusContract || !price))||
+           ( typecontract === "sale" && (!idproperty || !idbuyer || !idNumberbuyer || !paymentMethod || !transferDate || !idNumberowner || !statusContract || !price))
         ){
             return res.status(400).json({
                 status: "error",
@@ -40,7 +39,6 @@ const createContract = async (req,res) => {
         }
         return res.status(200).json(response);
     }catch(err){
-        console.log(err);
         return res.status(500).json({
             message:err
         })
@@ -49,13 +47,10 @@ const createContract = async (req,res) => {
 const getAllContract = async (req,res) => {
     try {
         const { limit,page,sort,filter,user,role} = req.query;
-        
-        console.log("data query",req.query);    
         const parsedSort = sort ? JSON.parse(sort) : null;
         const response = await ContractService.getAllContract(Number(page) || 1,Number(limit) || 8,parsedSort,filter,user,role);
         return res.status(200).json(response);
     }catch(e){
-        console.log(e);
         return res.status(500).json({
             message: e
         });
@@ -77,7 +72,6 @@ const updateContract = async (req,res) => {
         }
         return res.status(200).json(response);
     }catch(err){
-        console.log(err);
         return res.status(500).json({   
             message:err
         })
@@ -90,7 +84,6 @@ const getContractById = async (req,res) => {
         const response = await ContractService.getContractById(idcontract,iduser);
         return res.status(200).json(response);
     }catch(err){
-        console.log(err);
         return res.status(500).json({   
             message:err
         })
