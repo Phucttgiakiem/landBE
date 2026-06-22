@@ -9,7 +9,13 @@ require('dotenv').config();
 import cookieParser from "cookie-parser";
 let app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: [
+        "https://land-h4n1qtcvu-phuctrans-projects-20c33d9d.vercel.app",
+        "http://localhost:3000"
+    ],
+    credentials: true
+}));
 //config app
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
