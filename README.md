@@ -17,11 +17,12 @@ MongoDB
 ## Features
 
 - JWT Authentication
+- Verify via email
 - User Management
 - Property Management
 - Category Management
 - Statistics
-
+  
 ## Technologies
 
 - Node.js
