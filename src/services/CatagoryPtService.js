@@ -1,29 +1,31 @@
 import {CatagoryProperty} from "../models/Catagorypropertymodel.js";
-
-
+import { Listing } from "../models/Listingmodel.js";
+import mongoose from "mongoose";
 const createCatagoryPt = (newCatagoryPt) => {
     return new Promise(async (resolve, reject) => {
         
-        const { Name,Type } = newCatagoryPt;
+        const {name,typePost,friendlyURL,friendlyTypePostURL} = newCatagoryPt;
         try {
-            const checkCatagoryPt = await CatagoryProperty.findOne({ Name: Name });
+            const checkCatagoryPt = await CatagoryProperty.findOne({ Name: name });
             if (checkCatagoryPt !== null) {
                 resolve({
-                    status: "OK",
-                    message: "the CatagoryProduct already exists"
+                    status: "error",
+                    message: "Danh mục đã tồn tại trên hệ thống"
                 });
             }
            
             const createdCatagoryPt = await CatagoryProperty.create({
-                Name,
-                Type
+                Name:name,
+                NameSlug:friendlyURL,
+                Type:typePost,
+                TypeSlug:friendlyTypePostURL
             });
             if (createdCatagoryPt) {
                 resolve({
                     status: "OK",
                     message: "SUCCESS",
-                    data: createdCatagoryPt}
-                );
+                    data: createdCatagoryPt
+                });
             }
         } catch (e) {
             reject(e);
@@ -37,8 +39,8 @@ const updateCatagoryPt = (id, data) => {
             const checkCatagoryPt = await CatagoryProperty.findOne({ _id: id });
             if(checkCatagoryPt === null) {
                 resolve({
-                    status: "OK",
-                    message: "the CatagoryProperty is not defined"
+                    status: "error",
+                    message: "Danh mục không tìm thấy"
                 });
             }
             const updatedCatagory_pt = await CatagoryProperty.findByIdAndUpdate(id, data, { new: true });
@@ -73,11 +75,52 @@ const getAllCatagoryPt = () => {
                 data: allCatagoryPt
             });
         } catch (e) {
-            console.log(e);
             reject(e);
         }
     })
 }
+const getAllCatagoryforAdmin = (page, limit, filter, sort) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const query = {};
+
+            // Filter
+            if (filter?.Type) {
+                query.Type = filter.Type;
+            }
+
+            // Sort mặc định
+            let sortOption = { createdAt: -1 };
+
+            // Sort từ FE
+            if (sort?.field && sort?.order) {
+                sortOption = {
+                    [sort.field]: sort.order === "ascend" ? 1 : -1
+                };
+            }
+
+            const skip = (page - 1) * limit;
+
+            const [categories, total] = await Promise.all([
+                CatagoryProperty.find(query)
+                    .sort(sortOption)
+                    .skip(skip)
+                    .limit(limit),
+                CatagoryProperty.countDocuments(query)
+            ]);
+
+            resolve({
+                status: "OK",
+                data: categories,
+                total,
+                currentPage: page,
+                totalPage: Math.ceil(total / limit)
+            });
+        } catch (e) {
+            reject(e);
+        }
+    });
+};
 const getAllCatagorywithType = (typeListing) => {
     return new Promise(async (resolve,reject) => {
         try {
@@ -98,14 +141,24 @@ const deleteCatagoryPt = (id) => {
             const checkCatagoryPt = await CatagoryProperty.findOne({ _id: id });
             if(checkCatagoryPt === null) {
                 resolve({
-                    status: "OK",
-                    message: "the CatagoryProperty is not defined"
+                    status: "error",
+                    message: "Không tìm thấy danh mục"
                 });
             }
+            await Listing.updateMany(
+                {
+                    CatagoryProperty: new mongoose.Types.ObjectId(id)
+                },
+                {
+                    $set: {
+                        CatagoryProperty: null
+                    }
+                }
+            );
             await CatagoryProperty.findByIdAndDelete(id);
             resolve({
                 status: "OK",
-                message: "Delete CatagoryProperty success"
+                message: "Xóa danh mục thành công"
             });
         } catch (e) {
             reject(e);
@@ -116,6 +169,7 @@ module.exports = {
     createCatagoryPt,
     updateCatagoryPt,
     getAllCatagoryPt,
+    getAllCatagoryforAdmin,
     deleteCatagoryPt,
     getAllCatagorywithType
 }

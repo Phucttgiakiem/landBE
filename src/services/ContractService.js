@@ -180,7 +180,7 @@ const updateContract = (idcontract,userId,data) => {
                 contract.typeContract = typecontract;
                 contract.saleInfo = {
                     paymentMethod: paymentMethod,
-                    transferDate: convertdateformongodb(transferDate),
+                    transferDate: transferDate,
                 }
                 contract.status = statusContract;
                 contract.ownerSnapshot = {
@@ -371,7 +371,6 @@ const getAllContract = (page,limit,sort,filters,user,role) => {
                 total: totalcontract
             })
         } catch(err){
-            console.log(err);
             reject(err);
         }
     })
@@ -423,7 +422,6 @@ const getContractById = (idcontract,iduser) => {
             }
 
         } catch (err) {
-            console.log(err);
             reject(err);
         }
     })
@@ -453,7 +451,6 @@ const getContractByIdnotiduser = (idcontract) => {
                 })
             }
         } catch (err) {
-            console.log(err);
             reject(err);
         }   
     })

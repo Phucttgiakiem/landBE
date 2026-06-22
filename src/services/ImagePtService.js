@@ -63,7 +63,6 @@ const deleteImageonS3 = (url) => {
                 message: "Delete Image on S3 success"
             });
         } catch (e) {
-            console.log("error: ",e);
             reject(e);
         }       
     });

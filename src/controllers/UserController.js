@@ -47,7 +47,6 @@ const resendVerifyEmail = async (req,res) => {
         }
         return res.status(200).json(response);
     } catch(e){
-        console.log(e);
         return res.status(500).json({
             status: "error",
             message: e.message
@@ -82,7 +81,6 @@ const createUser = async (req, res) => {
        }
        return res.status(200).json(response);
     } catch (e) {
-        console.log("err: ",e);
         return res.status(500).json({
             message: e.message
         })
@@ -235,7 +233,6 @@ const getAllUser = async (req, res) => {
         const response = await UserService.getAllUser(Number(limit),Number(page),sorted,filtered,keyword);
         return res.status(200).json(response)
     }catch(e){
-        console.log(e);
         return res.status(500).json({
             message: e
         })

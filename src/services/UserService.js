@@ -42,7 +42,6 @@ const sendEmailBrevo = async (toEmail,subject,htmlContent) => {
                 data: result.messageId
             };
         }catch(e){
-            console.log(e);
             return {
                 status: "error",
                 message: "Gửi email thất bại. Vui lòng thử lại sau."

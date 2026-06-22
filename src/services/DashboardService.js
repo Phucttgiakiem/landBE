@@ -216,7 +216,6 @@ const getSellerOverview = (iduser) => {
 const getUserOverview = (iduser) => {
     return new Promise(async (resolve,reject) => {
         try {
-            const totalpropertyislike = await favorite.countDocuments({ userId: iduser });
             const topfivepropertynew = await Listing.aggregate([
                 {
                   $match: {
@@ -244,42 +243,19 @@ const getUserOverview = (iduser) => {
                   }
                 },
                 {
-                  $lookup: {
-                    from: "favorites",
-                    let: { idProperty: "$_id" },
-                    pipeline: [
-                      {
-                        $match: {
-                          $expr: {
-                            $and: [
-                              { $eq: ["$listingId", "$$idProperty"] },
-                              { $eq: ["$userId", new mongoose.Types.ObjectId(iduser)] }
-                            ]
-                          }
-                        }
-                      },
-                      { $limit: 1 } // chỉ cần biết có tồn tại hay không
-                    ],
-                    as: "favoriteData"
-                  }
-                },
-                {
                   $addFields: {
                     thumbnail: { $arrayElemAt: ["$images.URL", 0] },
-                    isFavorite: { $gt: [{ $size: "$favoriteData" }, 0] }
                   }
                 },
                 {
                   $project: {
                     images: 0,
-                    favoriteData: 0
                   }
                 }
             ]);
             resolve({
               status: "OK",
               message: "SUCCESS",
-              totalpropertyislike,
               topfivepropertynew
             })
         } catch(err){
