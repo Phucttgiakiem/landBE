@@ -12,6 +12,7 @@ let app = express();
 app.use(cors({
     origin: [
         "https://land-h4n1qtcvu-phuctrans-projects-20c33d9d.vercel.app",
+        "https://land-fe-omega.vercel.app",
         "http://localhost:3000"
     ],
     credentials: true
