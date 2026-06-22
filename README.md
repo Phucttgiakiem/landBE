@@ -6,7 +6,7 @@ RESTful API powering a real estate management platform.
 
 ## Architecture
 
-Route &#8594; Controller &#8594 Service &#8594 MongoDB
+Route --> Controller --> Service --> MongoDB
 
 ## Features
 
