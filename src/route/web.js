@@ -7,6 +7,7 @@ import favoriteRouter from "./favoriteRouter.js";
 import DashboardRouter from "./DashboardRouter.js";
 import ContractRouter from "./ContractRouter.js";
 import StatisticalRouter from "./StatisticalRouter.js";
+import AddressRouter from "./AddressRouter.js";
 const routes = (app) => {
     app.use('/api/user',UserRouter);
     app.use('/api/catagory_property',CatagorypropertyRouter);
@@ -17,5 +18,6 @@ const routes = (app) => {
     app.use("/api/Dashboard",DashboardRouter);
     app.use("/api/Contract",ContractRouter);
     app.use("/api/Statistical",StatisticalRouter);
+    app.use("/api/Address",AddressRouter);
 }
 module.exports = routes;
