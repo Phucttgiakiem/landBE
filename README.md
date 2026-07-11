@@ -28,15 +28,19 @@ Route --> Controller --> Service --> MongoDB
 - SUFY
 
 ## Environment Variables
-POST=8089
 
-MONGODB_URL = your MongoDB connection string
+To run this project locally, you need to create the following environment variables.
 
-JWT_SECRET = you set it up yourself
+### Sufy Cloud
+### 1. Create a Sufy Cloud account
+Register for a Sufy Cloud account and create a storage bucket.
 
-ACCESS_TOKEN = you set it up yourself
+### 2. Get your credentials
+Copy the required credentials from your Sufy Cloud dashboard.
 
-REFRESH_TOKEN = you set it up yourself
+### 3. Create a `.env` file
+Create a `.env` file in the project root and add the following variables:
+
 
 SUFY_ACCESS_KEY= This section can be found in the Sufy Cloud service
 
@@ -46,9 +50,28 @@ SUFY_BUCKET= This section can be found in the Sufy Cloud service
 
 SUFY_PUBLIC_URL = This section can be found in the Sufy Cloud service
 
-API_KEY_BREVO= This section can be found in the Brevo service.
+### Brevo
+### 1. Create a Brevo
+Register for a Brevo and press Settings.
 
-BROVO_SENDER_EMAIL= This section can be found in the Brevo service
+### 2. Get your credentials
+Press SMTP & API and Create create API Keys.
+
+copy the API Keys
+
+### 3 Create variable in `.env` file
+API_KEY_BREVO = the API Keys
+BREVO_SENDER_EMAIL = the email that you sign up on Brevo
+
+### another environment variables
+POST=8089
+MONGODB_URL = your MongoDB connection string
+
+JWT_SECRET = you set it up yourself
+
+ACCESS_TOKEN = you set it up yourself
+
+REFRESH_TOKEN = you set it up yourself
 
 ## Related Repository
 Frontend: https://github.com/Phucttgiakiem/landFE.git
