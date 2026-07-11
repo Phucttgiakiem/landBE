@@ -61,6 +61,8 @@ copy the API Keys
 
 ### 3 Create variable in `.env` file
 API_KEY_BREVO = the API Keys
+
+
 BREVO_SENDER_EMAIL = the email that you sign up on Brevo
 
 ### another environment variables
