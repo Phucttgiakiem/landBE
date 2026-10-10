@@ -6,7 +6,7 @@ const catagoryPropertySchema = new mongoose.Schema(
         NameSlug: {type:String, unique:true},
         Type: { 
             type: String, 
-            enum:["Nhà đất bán","Nhà đất cho thuê"],
+            enum:["Sale","Rental"],
             required: true 
         },
         TypeSlug: {type:String},

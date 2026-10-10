@@ -124,12 +124,12 @@ const createContract = (iduser,data) => {
             if(resultcontract){
                 resolve({
                     status: "OK",
-                    message: "Tạo hợp đồng thành công"
+                    message: "the contract is created successfully",
                 });
             }else {
                 resolve({
                     status: "error",
-                    message: "Tạo hợp đồng không thành công, thử lại !!!"
+                    message: "the contract is not created successfully, please try again !!!"
                 })
             }
         } catch(err){
@@ -149,7 +149,7 @@ const updateContract = (idcontract,userId,data) => {
             if(!contract){
                 response = {
                     status: "error",
-                    message: "Không tìm thấy hợp đồng"
+                    message: "the contract is not found"
                 }
             }
             else if(typecontract === "rent"){
@@ -199,12 +199,12 @@ const updateContract = (idcontract,userId,data) => {
             if(resultcontract){
                 response ={   
                     status: "OK",
-                    message: "Cập nhật hợp đồng thành công"
+                    message: "the contract is updated successfully"
                 };
             }else {
                 response = {
                     status: "error",
-                    message: "Cập nhật hợp đồng không thành công, thử lại !!!"
+                    message: "the contract is not updated successfully, please try again !!!"
                 }
             }
             resolve(response);
@@ -382,14 +382,14 @@ const getContractById = (idcontract,iduser) => {
             if (!mongoose.Types.ObjectId.isValid(idcontract)) {
                 return resolve({
                     status: "err",
-                    message: "Id contract không hợp lệ"
+                    message: "the contract id is not valid"
                 })
             }
 
             if (!mongoose.Types.ObjectId.isValid(iduser)) {
                 return resolve({
                     status: "err",
-                    message: "Id user không hợp lệ"
+                    message: "the user id is not valid"
                 })
             }
 
@@ -416,7 +416,7 @@ const getContractById = (idcontract,iduser) => {
 
                 resolve({
                     status: "error",
-                    message: "Không tìm thấy hợp đồng"
+                    message: "the contract is not found"
                 })
 
             }
@@ -432,7 +432,7 @@ const getContractByIdnotiduser = (idcontract) => {
             if (!mongoose.Types.ObjectId.isValid(idcontract)) {
                 return resolve({
                     status: "err",
-                    message: "mã hợp đồng không hợp lệ"
+                    message: "the contract id is not valid"
                 })
             }
             const contract = await Contract.findById(idcontract);
@@ -447,7 +447,7 @@ const getContractByIdnotiduser = (idcontract) => {
             else {
                 resolve({
                     status: "error",
-                    message: "Không tìm thấy hợp đồng"
+                    message: "the contract is not found"
                 })
             }
         } catch (err) {

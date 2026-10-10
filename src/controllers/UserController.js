@@ -26,19 +26,19 @@ const resendVerifyEmail = async (req,res) => {
         if(!email) {
             return res.status(400).json({
                 status: "error",
-                message: "Email không được để trống"
+                message: "the input field email is required"
             });
         }
         if(!isEmailValid) {
             return res.status(400).json({
                 status: "error",
-                message: "Email không hợp lệ"
+                message: "Email is not valid"
             });
         }
         if(!type) {
             return res.status(400).json({
                 status: "error",
-                message: "Type không được để trống"
+                message: "the input field type is required"
             });
         }
         const response = await UserService.resendVerificationEmail(email,type);
@@ -157,25 +157,25 @@ const resetpass = async (req,res) => {
         if(!newpass) {
             return res.status(400).json({
                 field: "newpass",
-                message: "Vui lòng nhập mật khẩu mới"
+                message: "Please enter a new password"
             })
         }
         if(!confirmpass) {
             return res.status(400).json({
                 field: "confirmpass",
-                message: "Vui lòng nhập nhắc lại mật khẩu"
+                message: "Please enter the password again"
             })
         }
         if(!ispassvalid){
             return res.status(400).json({
                 field:"newpass",
-                message: "Mật khẩu mới không đúng định dạng"
+                message: "The new password is not valid"
             })
         }
         if(newpass !== confirmpass){
             return res.status(400).json({
                 field: "confirmpass",
-                message: "Mật khẩu nhắc lại không khớp"
+                message: "The confirmed password does not match"
             })
         }
         const response = await UserService.resetpass(newpass,email);
@@ -199,17 +199,17 @@ const changePass = async (req,res) => {
         if(!oldpass || !newpass || !confirmpass || !id){
             return res.status(400).json({
                 status: "error",
-                message: "các trường thông tin không được để trống"
+                message: "the input fields are required"
             });
         }else if(!ispassvalid){
             return res.status(400).json({
                 status: "error",
-                message: "mật khẩu không đúng định dạng"
+                message: "the password is not valid"
             })
         }else if(newpass !== confirmpass){
             return res.status(400).json({
                 status: "error",
-                message: "trường mật khẩu và nhập lại mật khẩu không khớp nhau"
+                message: "the password and confirm password do not match"
             })
         }
         const response = await UserService.ChangePass(id,oldpass,newpass);

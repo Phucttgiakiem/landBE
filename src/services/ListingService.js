@@ -63,7 +63,7 @@ const updateListing = (id,data,files) => {
             if(checkListing === null){
                 response = {
                     status: "error",
-                    message: "không tìm thấy bài đăng bất động sản"
+                    message: "Listing not found"
                 }
             }else {
                 // when update listing, any field another initial field, the field will be update
