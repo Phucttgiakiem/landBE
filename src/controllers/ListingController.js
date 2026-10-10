@@ -29,7 +29,7 @@ const updateListing = async (req,res) => {
         if(!Listingid) {
             return res.status(400).json({
                 status: "error",
-                message: "mã bài đăng không được bỏ qua"
+                message: "the code of property is required"
             })
         }
         const response = await ListingService.updateListing(Listingid,data,req.files);

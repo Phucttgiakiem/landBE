@@ -22,7 +22,7 @@ const createContract = async (req,res) => {
         if(!typecontract){
             return res.status(400).json({
                 status: "error",
-                message: "các trường nhập không được để trống"
+                message: "the input field typecontract is required"
             });
         }
         if((typecontract === "rent" && (!idproperty || !idtenant || !idNumbertenant || !startdate || !enddate || !deposit || !idNumberowner || !statusContract || !price))||
@@ -30,7 +30,7 @@ const createContract = async (req,res) => {
         ){
             return res.status(400).json({
                 status: "error",
-                message: "các trường nhập không được để trống"
+                message: "the input field is required"
             });
         }
         const response = await ContractService.createContract(iduser,req.body);
@@ -63,7 +63,7 @@ const updateContract = async (req,res) => {
         if(!idcontract || !statusContract){
             return res.status(400).json({
                 status: "error",
-                message: "các trường nhập không được để trống"
+                message: "the input field is required"
             });
         }
         const response = await ContractService.updateContract(idcontract,userId,req.body);

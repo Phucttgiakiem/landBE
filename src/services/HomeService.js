@@ -5,17 +5,18 @@ import {attachFavorite} from "../utils/Functioncustom.js";
 const getAllHome = () => {
     return new Promise(async(resolve,reject) => {
         try {
+            const NO_EXPIRY = new Date(0); // 1970-01-01
             const featured = await Listing.aggregate([
                 {
                     $match: {
                     approval_status: "đã xác thực",
                     visibility_status: "công khai",
                     type:"vip",
-                    ExpiredAt: {
-                        $gte: new Date()
-                    },
                     isDeleted: false,
-
+                    $or: [
+                        { ExpiredAt: { $gte: new Date() } },
+                        { ExpiredAt: NO_EXPIRY }
+                    ]
                     }
                 },
                 {
@@ -52,10 +53,11 @@ const getAllHome = () => {
                     $match: {
                         approval_status: "đã xác thực",
                         visibility_status: "công khai",
-                         ExpiredAt: {
-                            $gte: new Date()
-                        },
-                        isDeleted: false
+                        isDeleted: false,
+                        $or: [
+                            { ExpiredAt: { $gte: new Date() } },
+                            { ExpiredAt: NO_EXPIRY }
+                        ]
                     }
                 },
                 {
@@ -93,10 +95,11 @@ const getAllHome = () => {
                         Price: { $lte: 8000000 },
                         approval_status: "đã xác thực",
                         visibility_status: "công khai",
-                         ExpiredAt: {
-                            $gte: new Date()
-                        },
-                        isDeleted: false
+                        isDeleted: false,
+                        $or: [
+                            { ExpiredAt: { $gte: new Date() } },
+                            { ExpiredAt: NO_EXPIRY }
+                        ]
                     }
                 },
                 {
@@ -139,14 +142,11 @@ const getAllHome = () => {
             const countraw = await Listing.aggregate([
                 {
                     $match: {
-                    approval_status: "đã xác thực",
-                    visibility_status: "công khai",
-                    ExpiredAt: {
-                        $gte: new Date()
+                        approval_status: "đã xác thực",
+                        visibility_status: "công khai",
+                        isDeleted: false,
+                        "Address.City.id": { $in: cityIds },
                     },
-                    isDeleted: false,
-                    "Address.City.id": { $in: cityIds }
-                    }
                 },
                 {
                     $group: {
@@ -165,6 +165,7 @@ const getAllHome = () => {
                 name: city.name,
                 count: resultMap[city._id] || 0
             }));
+            
             resolve({
                 status: "OK",
                 message: "SUCCESS",
@@ -174,6 +175,7 @@ const getAllHome = () => {
                 countnews: countnews,
             })
         }catch(e){
+            console.log("error",e);
             reject(e);
         }
     });

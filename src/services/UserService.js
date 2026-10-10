@@ -38,13 +38,14 @@ const sendEmailBrevo = async (toEmail,subject,htmlContent) => {
             });
             return {
                 status: "OK",
-                message: "Yêu cầu xác thực đã được gửi thành công. Vui lòng kiểm tra email của bạn.",
+                message: "the code for verification has been sent to your email. Please check your email to verify your account",
                 data: result.messageId
             };
         }catch(e){
+            console.error("Error in sendEmailBrevo:", e);
             return {
                 status: "error",
-                message: "Gửi email thất bại. Vui lòng thử lại sau."
+                message: "Failed to send verification email. Please try again later."
             };
         }
 }
@@ -58,33 +59,33 @@ const verifyEmail = (token) => {
                 if(!user){
                     response = {
                         status: "error",
-                        message: "tài khoản không tồn tại"
+                        message: "the account is not found"
                     };
                 }else if(user.isVerified) {
                     response = {
                         status: "error",
-                        message: "tài khoản đã được xác thực"
+                        message: "the account has already been verified"
                     };
                 }else {
                     user.isVerified = true;
                     await user.save();
                     response = {
                         status: "OK",
-                        message: "Xác thực tài khoản thành công, bạn có thể đăng nhập vào hệ thống"
+                        message: "the account has been verified successfully, you can now log in to the system"
                     };
                 }
             }else {
                 if(!user){
                     response = {
                         status: "error",
-                        message: "tài khoản không tồn tại"
+                        message: "the account is not found"
                     };
                 }
                 else {
                     response = {
                         status: "OK",
                         email:user.email,
-                        message:"Bạn có thể đổi mật khẩu với yêu cầu bên dưới"
+                        message:"you can now reset your password with instructions below"
                     }
                 }
             }
@@ -94,12 +95,12 @@ const verifyEmail = (token) => {
             if(e.name === "TokenExpiredError") {
                 response = {
                     status: "error",
-                    message: "token đã hết hạn"
+                    message: "the token has expired"
                 };
             }else {
                 response = {
                     status: "error",
-                    message: "xác thực tài khoản thất bại"
+                    message: "failed to verify the account"
                 };
             }
             reject(response);
@@ -114,7 +115,7 @@ const resendVerificationEmail = (email,type) => {
             if (!user) {
                 return resolve({
                     status: "error",
-                    message: "Tài khoản không tồn tại"
+                    message: "the account is not found"
                 });
             }
 
@@ -123,7 +124,7 @@ const resendVerificationEmail = (email,type) => {
             if (!validTypes.includes(type)) {
                 return resolve({
                     status: "error",
-                    message: "Type không hợp lệ"
+                    message: "the type is not valid"
                 });
             }
 
@@ -131,7 +132,7 @@ const resendVerificationEmail = (email,type) => {
             if (type !== "reset-password" && user.isVerified) {
                 return resolve({
                     status: "error",
-                    message: "Tài khoản đã được xác minh"
+                    message: "the account has already been verified"
                 });
             }
 
@@ -139,7 +140,7 @@ const resendVerificationEmail = (email,type) => {
             if (type === "reset-password" && !user.isVerified) {
                 return resolve({
                     status: "error",
-                    message: "Tài khoản chưa xác minh email"
+                    message: "the account has not been verified"
                 });
             }
 
@@ -270,7 +271,7 @@ const loginUser = (userLogin) => {
                     response = {
                         status: "error",
                         code: "EMAIL_NOT_VERIFIED",
-                        message: "Tài khoản chưa được xác thực. Chúng tôi chuyển bạn đến trang xác thực email"
+                        message: "the account has not been verified, You will be redirected to the authentication page"
                     };
                 }
                 else {
@@ -356,7 +357,7 @@ const resetpass = (newpass,email) => {
             if(checkUser === null){
                 response = {
                     status: "error",
-                    message: "không tìm thấy người dùng trên hệ thống"
+                    message: "the user is not found in the system"
                 };
             }
             const hash = bcrypt.hashSync(newpass, 10);
@@ -366,7 +367,7 @@ const resetpass = (newpass,email) => {
             );
             response = {
                 status: "OK",
-                message: "cập nhật mật khẩu thành công, giờ bạn có thể đăng nhập với mật khẩu mới"
+                message: "the password has been updated successfully, you can now log in with the new password"
             }
             resolve(response);
         }catch(e){
@@ -382,7 +383,7 @@ const ChangePass = (id,oldpass,newpass)=> {
             if(checkUser === null){
                 response = {
                     status: "error",
-                    message: "tài khoản với mật khẩu này không được tìm thấy"
+                    message: "the account with this password is not found"
                 };
             }else  {
                 const isMatched = await bcrypt.compare(oldpass, checkUser.password);
@@ -390,7 +391,7 @@ const ChangePass = (id,oldpass,newpass)=> {
                 if (!isMatched) {
                     response = {
                         status: "error",
-                        message: "thông tin mật khẩu cũ không khớp với mật khẩu trên hệ thống"
+                        message: "the old password does not match the password in the system"
                     };
                 }else {
                     const hash = bcrypt.hashSync(newpass, 10);
@@ -400,7 +401,7 @@ const ChangePass = (id,oldpass,newpass)=> {
                     );
                     response = {
                         status: "OK",
-                        message: "Thay đổi mật khẩu thành công"
+                        message: "the password has been updated successfully"
                     };
                 }
             }
@@ -462,7 +463,7 @@ const getAllowner = () => {
             }else {
                 resolve({
                     status: "OK",
-                    message: "không tìm thấy owner",
+                    message: "the owner is not found",
                     owner: []
                 });
             }

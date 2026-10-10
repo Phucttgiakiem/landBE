@@ -10,7 +10,7 @@ const createCatagoryPt = (newCatagoryPt) => {
             if (checkCatagoryPt !== null) {
                 resolve({
                     status: "error",
-                    message: "Danh mục đã tồn tại trên hệ thống"
+                    message: "the name of catagory property is already exists"
                 });
             }
            
@@ -40,7 +40,7 @@ const updateCatagoryPt = (id, data) => {
             if(checkCatagoryPt === null) {
                 resolve({
                     status: "error",
-                    message: "Danh mục không tìm thấy"
+                    message: "the catagory property is not found"
                 });
             }
             const updatedCatagory_pt = await CatagoryProperty.findByIdAndUpdate(id, data, { new: true });
@@ -142,7 +142,7 @@ const deleteCatagoryPt = (id) => {
             if(checkCatagoryPt === null) {
                 resolve({
                     status: "error",
-                    message: "Không tìm thấy danh mục"
+                    message: "the catagory property is not found"
                 });
             }
             await Listing.updateMany(
@@ -158,7 +158,7 @@ const deleteCatagoryPt = (id) => {
             await CatagoryProperty.findByIdAndDelete(id);
             resolve({
                 status: "OK",
-                message: "Xóa danh mục thành công"
+                message: "the catagory property is deleted successfully"
             });
         } catch (e) {
             reject(e);
