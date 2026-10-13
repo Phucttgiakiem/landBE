@@ -35,8 +35,8 @@ const createListing = (data,files) => {
                 bathroom:bathroom,
                 Toilet:Toilet,
                 Legal:Legal,
-                approval_status: "chưa xác thực",
-                visibility_status: "công khai",
+                approval_status: "pending",
+                visibility_status: "public",
                 User:User,
                 CatagoryProperty:CatagoryProperty,
                 type: Type
@@ -50,6 +50,7 @@ const createListing = (data,files) => {
                 message: "SUCCESS",
             });
         } catch (e) {
+            console.error("Error creating listing:", e);
             reject(e);
         }
     })

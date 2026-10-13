@@ -97,15 +97,18 @@ const loginUser = async (req, res) => {
             });
         }
        const response =  await UserService.loginUser(req.body);
+
+       if (response.status === "error") {
+            return res.status(400).json(response);
+       }
+
        const { refresh_Token,...newResponse} = response;
        res.cookie('refresh_token', refresh_Token, {
             httpOnly: true,
             secure: false,
-            samesite: 'strict'
+            sameSite: 'strict'
        })
-       if (response.status === "error") {
-            return res.status(400).json(response);
-       }
+       
        return res.status(200).json(newResponse);
     } catch (e) {
         return res.status(500).json({

@@ -6,13 +6,13 @@ const ContractSchema = new mongoose.Schema(
         ref: "Listings",
         required: true
         },
-        buyerId: { type: mongoose.Schema.Types.ObjectId, ref: "users" }, // sale
-        tenantId: { type: mongoose.Schema.Types.ObjectId, ref: "users" }, // rent
+        buyerId: { type: mongoose.Schema.Types.ObjectId, ref: "users" }, 
+        tenantId: { type: mongoose.Schema.Types.ObjectId, ref: "users" }, 
         ownerId: { type: mongoose.Schema.Types.ObjectId, ref: "users", required: true },
 
         typeContract: {
         type: String,
-        enum: ["sale", "rent"],
+        enum: ["Sale", "Rental"],
         required: true
         },
 
@@ -29,7 +29,7 @@ const ContractSchema = new mongoose.Schema(
 
         status: {
             type: String,
-            enum: ["mới tạo", "đã ký", "xong", "hủy"],
+            enum: ["new", "signed", "completed", "cancelled"],
             required: true
         },
 
@@ -56,7 +56,7 @@ const ContractSchema = new mongoose.Schema(
             area: { type: String }
         },
 
-        terms: { type: String, default: "Không có" }
+        terms: { type: String, default: "none" }
     },
     {
         timestamps: true
