@@ -161,19 +161,19 @@ const resendVerificationEmail = (email,type) => {
             const result = await sendEmailBrevo(
                 email,
                 type === "reset-password"
-                    ? "Đặt lại mật khẩu"
-                    : "Xác thực tài khoản",
+                    ? "reset password"
+                    : "verify your account",
                 `
-                <p>Xin chào ${user.fullname}</p>
-                <p>Vui lòng nhấn vào link bên dưới:</p>
+                <p>welcome ${user.fullname}</p>
+                <p>Please click the link below:</p>
                 <a href="${linkverify}">
                     ${
                         type === "reset-password"
-                            ? "Đặt lại mật khẩu"
-                            : "Xác thực tài khoản"
+                            ? "Reset Password"
+                            : "Verify Your Account"
                     }
                 </a>
-                <p>Link sẽ hết hạn sau 15 phút.</p>
+                <p>Link will expire in 15 minutes.</p>
                 `
             );
 
@@ -198,7 +198,7 @@ const createUser = (newUser) => {
                 response ={
                     status: "error",
                     errorfield: "email",
-                    message: "Email đã tồn tại trên hệ thống"
+                    message: "the email is already in use, please use another email"
                 };
             }
             else {
@@ -225,12 +225,12 @@ const createUser = (newUser) => {
                 const verifyLink = `${process.env.CLIENT_URL}/verify-email?token=${verifyToken}`;
                 const result = await sendEmailBrevo (
                     createdUser.email,
-                    "Xác thực tài khoản",
+                    "Verify Your Account",
                     `
-                    <p>Xin chào ${createdUser.fullname},</p>
-                    <p>Vui lòng click vào link dưới đây để xác thực tài khoản của bạn:</p>
-                    <a href="${verifyLink}" target="_blank">Xác thực tài khoản</a>
-                    <p>Link sẽ hết hạn sau 15 phút.</p>
+                    <p>Welcome ${createdUser.fullname},</p>
+                    <p>Please click the link below to verify your account:</p>
+                    <a href="${verifyLink}" target="_blank">Verify Your Account</a>
+                    <p>Link will expire in 15 minutes.</p>
                     `
                 );
                 if(result.status === "error"){

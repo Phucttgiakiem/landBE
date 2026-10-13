@@ -13,7 +13,7 @@ const getinfoforCreatecontract = async (req,res) => {
 }
 const createContract = async (req,res) => {
     try {
-        //sửa key tới tenantfullName
+        
         const iduser = req.user.id;
         const {idproperty,idbuyer,idtenant,typecontract,price,deposit,startdate,enddate,
                 paymentMethod,transferDate,statusContract,fullnamebuyer,idNumberbuyer,addressbuyer,fullnameowner,idNumberowner,addressowner,
@@ -39,6 +39,7 @@ const createContract = async (req,res) => {
         }
         return res.status(200).json(response);
     }catch(err){
+        console.log(err);
         return res.status(500).json({
             message:err
         })

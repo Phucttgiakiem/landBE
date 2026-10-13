@@ -2,16 +2,15 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 dotenv.config();
 const genneralAccessToken = async(payload) => {
-   // console.log("payload: ", payload);
     const access_token = jwt.sign({
         ...payload
-    },process.env.ACCESS_TOKEN,{expiresIn: '15m'});
+    },process.env.ACCESS_TOKEN,{expiresIn: '2000'});
     return access_token;
 }
 const genneralRefreshToken = async(payload) => {
     const refresh_token = jwt.sign({
         ...payload
-    },process.env.REFRESH_TOKEN,{expiresIn: '365d'});
+    },process.env.REFRESH_TOKEN,{expiresIn: '3000'});
     return refresh_token;
 }
 const refreshTokenJwtService = (token) => {
@@ -19,7 +18,7 @@ const refreshTokenJwtService = (token) => {
         try {
             jwt.verify(token, process.env.REFRESH_TOKEN, async (err, user) => {
                 if(err){
-                    resolve({
+                   return resolve({
                         status: "ERROR",
                         message: 'The authentication'
                     })
@@ -29,7 +28,7 @@ const refreshTokenJwtService = (token) => {
                     id: user?.id, 
                     isAdmin: user?.isAdmin
                 });
-                resolve({
+              return resolve({
                     status: "OK",
                     message: "SUCCESS",
                     access_token

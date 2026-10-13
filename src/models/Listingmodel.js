@@ -24,15 +24,15 @@ const ListingSchema = new mongoose.Schema(
         Toilet: {type:Number, required:true},
         Legal: {
             type: String,
-            enum: ["sổ đỏ", "sổ hồng", "hợp đồng mua bán", "đang chờ sổ"],
+            enum: ["RC", "PIC", "SC", "PEC"],
             required:true},
         approval_status: {
             type: String, 
-            enum: ["chưa xác thực", "đã xác thực", "từ chối"],
+            enum: ["pending", "approved", "rejected"],
             required:true},
         visibility_status: {
             type: String, 
-            enum: ["công khai", "ẩn","bị khóa","hết hạn"],
+            enum: ["public", "private","blocked","expired"],
             required:true},
         User: {type: mongoose.Schema.Types.ObjectId, ref: "users", required: true},
         CatagoryProperty: {type: mongoose.Schema.Types.ObjectId, ref: "catagorypropertys", default: null},

@@ -17,6 +17,7 @@ const createListing = async(req,res) => {
         const response = await ListingService.createListing(req.body,req.files);
         return res.status(200).json(response);
     }catch (e) {
+        
         return res.status(404).json({
             message: e
         })
@@ -46,7 +47,6 @@ const updateListing = async (req,res) => {
 const deleteListing = async (req, res) => {
     try {
         const {arrid,typedelete} = req.body;
-        console.log(req.body);
         if(arrid.length === 0){
             return res.status(400).json({
                 status: "error",
