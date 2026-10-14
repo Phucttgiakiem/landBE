@@ -9,8 +9,8 @@ const getAllHome = () => {
             const featured = await Listing.aggregate([
                 {
                     $match: {
-                    approval_status: "đã xác thực",
-                    visibility_status: "công khai",
+                    approval_status: "approved",
+                    visibility_status: "public",
                     type:"vip",
                     isDeleted: false,
                     $or: [
@@ -51,8 +51,8 @@ const getAllHome = () => {
             const latest = await Listing.aggregate([
                 {
                     $match: {
-                        approval_status: "đã xác thực",
-                        visibility_status: "công khai",
+                        approval_status: "approved",
+                        visibility_status: "public",
                         isDeleted: false,
                         $or: [
                             { ExpiredAt: { $gte: new Date() } },
@@ -93,8 +93,8 @@ const getAllHome = () => {
                 {
                     $match: {
                         Price: { $lte: 8000000 },
-                        approval_status: "đã xác thực",
-                        visibility_status: "công khai",
+                        approval_status: "approved",
+                        visibility_status: "public",
                         isDeleted: false,
                         $or: [
                             { ExpiredAt: { $gte: new Date() } },
@@ -142,8 +142,8 @@ const getAllHome = () => {
             const countraw = await Listing.aggregate([
                 {
                     $match: {
-                        approval_status: "đã xác thực",
-                        visibility_status: "công khai",
+                        approval_status: "approved",
+                        visibility_status: "public",
                         isDeleted: false,
                         "Address.City.id": { $in: cityIds },
                     },
@@ -190,8 +190,8 @@ const getAllListingRelated = (limit,page,CommuneID,CityID) => {
               "Address.Commune.id": CommuneID,
                 "Address.City.id": CityID,
                 isDeleted: { $ne: true },
-                approval_status: "đã xác thực",
-                visibility_status: { $nin: ["ẩn", "bị khóa"] }
+                approval_status: "approved",
+                visibility_status: { $nin: ["private", "blocked"] }
             }
             const AllListing = await Listing.aggregate([
                 {
@@ -199,8 +199,8 @@ const getAllListingRelated = (limit,page,CommuneID,CityID) => {
                         isDeleted: false,
                         "Address.Commune.id": CommuneID,
                         "Address.City.id": CityID,
-                        approval_status: "đã xác thực",
-                        visibility_status: { $nin: ["ẩn", "bị khóa"] }
+                        approval_status: "approved",
+                        visibility_status: { $nin: ["private", "blocked"] }
                     },
                 },
                 {
@@ -565,8 +565,8 @@ const getAllpropertyofbroker = (idowner,filter,page,limit) => {
                     $match: {
                         isDeleted: false,
                         User: new mongoose.Types.ObjectId(idowner),
-                        approval_status: "đã xác thực",
-                        visibility_status: "công khai"
+                        approval_status: "approved",
+                        visibility_status: "public"
                     }
                 },
                 {
