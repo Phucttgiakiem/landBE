@@ -4,13 +4,13 @@ dotenv.config();
 const genneralAccessToken = async(payload) => {
     const access_token = jwt.sign({
         ...payload
-    },process.env.ACCESS_TOKEN,{expiresIn: '2000'});
+    },process.env.ACCESS_TOKEN,{expiresIn: '15m'});
     return access_token;
 }
 const genneralRefreshToken = async(payload) => {
     const refresh_token = jwt.sign({
         ...payload
-    },process.env.REFRESH_TOKEN,{expiresIn: '3000'});
+    },process.env.REFRESH_TOKEN,{expiresIn: '180m'});
     return refresh_token;
 }
 const refreshTokenJwtService = (token) => {

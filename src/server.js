@@ -1,6 +1,5 @@
 import express from "express";
 import bodyParser from "body-parser";
-//import initWebRoutes from "./route/web.js";
 import connectToMongoDB from "./config/mongodb.js";
 
 import routes from "./route/web.js";
