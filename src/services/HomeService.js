@@ -1,11 +1,9 @@
 import mongoose from "mongoose";
 import {Listing} from "../models/Listingmodel.js";
-import {getFavoritelistofuser} from "../services/FavoriteService.js";
-import {attachFavorite} from "../utils/Functioncustom.js";
 const getAllHome = () => {
     return new Promise(async(resolve,reject) => {
         try {
-            const NO_EXPIRY = new Date(0); // 1970-01-01
+            const NO_EXPIRY = new Date(0); 
             const featured = await Listing.aggregate([
                 {
                     $match: {
@@ -132,11 +130,11 @@ const getAllHome = () => {
                 }
             ]);
             const cities = [
-                {_id: "01", name: "Hà Nội"},
-                {_id: "46", name: "Huế"},
-                {_id: "48", name: "Đà Nẵng"},
-                {_id: "79", name: "Hồ Chí Minh"},
-                {_id: "75", name: "Đồng Nai"},
+                {_id: "01", name: "Ha Noi"},
+                {_id: "46", name: "Hue"},
+                {_id: "48", name: "Da Nang"},
+                {_id: "79", name: "Ho Chi Minh"},
+                {_id: "75", name: "Dong Nai"},
             ]
             const cityIds = cities.map(c => c._id);
             const countraw = await Listing.aggregate([
