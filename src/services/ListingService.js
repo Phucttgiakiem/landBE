@@ -1,8 +1,6 @@
 import mongoose from "mongoose";
 import {Listing} from "../models/Listingmodel.js"
 import ImagePtService from "../services/ImagePtService.js";
-import FavoriteService from "../services/FavoriteService.js";
-import { normalize } from "../utils/Text.js";
 const createListing = (data,files) => {
     return new Promise(async (resolve, reject) => {
          const {Title,Description,Price,numberhouse,Commune,City,
